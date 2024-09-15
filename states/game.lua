@@ -3,7 +3,7 @@ local game = {}
 function game:init()
 
     self.buttons = {
-        Button(50, 100, 200, 10, 'Back', function()
+        Button(210, 130, 70, 20, 'Back', function()
             State.switch(States.start)
         end)
     }
@@ -11,12 +11,14 @@ end
 
 function game:enter()
 
-    lg.setBackgroundColor(0.2, 0.2, 0.22)
+    lg.setBackgroundColor(Colors[4])
 
 end
 
 function game:update(dt)
-
+    for _, b in ipairs(self.buttons) do
+        b:update(dt)
+    end
 end
 
 function game:keypressed(key, code)
@@ -32,10 +34,8 @@ function game:mousepressed(x, y, mbutton)
 end
 
 function game:draw()
-
-    lg.setFont(Fonts.default[10])
     for _, b in ipairs(self.buttons) do
-        b:render(Resolution.toGame(lm.getPosition()))
+        b:render()
     end
 end
 

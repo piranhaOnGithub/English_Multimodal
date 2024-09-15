@@ -1,21 +1,30 @@
 local start = {}
 
 function start:init()
+    self.num = 1
     self.buttons = {
-        Button(210, 130, 70, 20, 'game', function()
+        Button(VIRT_WIDTH / 2 - 50, VIRT_HEIGHT / 2 - 15, 100, 30, 'game', function()
             State.switch(States.game)
+        end),
+        Button(VIRT_WIDTH / 2 - 50, VIRT_HEIGHT / 2 + 30, 100, 30, 'settings', function()
+            State.switch(States.config)
+        end),
+        Button(VIRT_WIDTH / 2 - 50, VIRT_HEIGHT / 2 + 75, 100, 30, 'quit', function()
+            love.event.quit()
         end),
     }
 end
 
 function start:enter()
-    
-    lg.setBackgroundColor(0.2, 0.22, 0.2)
+
+    lg.setBackgroundColor(Colors[2])
 
 end
 
 function start:update(dt)
-
+    for _, b in ipairs(self.buttons) do
+        b:update(dt)
+    end
 end
 
 function start:keypressed(key, code)
@@ -30,12 +39,8 @@ function start:mousepressed(x, y, mbutton)
 end
 
 function start:draw()
-    lg.setFont(Fonts.default[30])
-    lg.printf("Hello World!", 0, VIRT_HEIGHT / 2, VIRT_WIDTH, 'center')
-
-    lg.setFont(Fonts.default[10])
     for _, b in ipairs(self.buttons) do
-        b:render(Resolution.toGame(lm.getPosition()))
+        b:render()
     end
 end
 

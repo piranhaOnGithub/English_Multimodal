@@ -14,6 +14,7 @@ Timer       = require 'libs.timer'
 -- [[ Packages ]]
 require 'src.shortcuts'
 require 'src.globals'
+require 'src.assets'
 
 -- [[ Classes ]]
 require 'src.class.Button'
@@ -22,4 +23,5 @@ require 'src.class.Button'
 States = {
     start   = require 'states.start',
     game    = require 'states.game',
+    config  = require 'states.config'
 }
