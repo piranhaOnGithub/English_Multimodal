@@ -7,7 +7,7 @@ function start:init()
             State.switch(States.game)
         end),
         Button(VIRT_WIDTH / 2 - 50, VIRT_HEIGHT / 2 + 30, 100, 30, 'settings', function()
-            State.switch(States.config)
+            State.push(States.config)
         end),
         Button(VIRT_WIDTH / 2 - 50, VIRT_HEIGHT / 2 + 75, 100, 30, 'quit', function()
             love.event.quit()
@@ -16,6 +16,12 @@ function start:init()
 end
 
 function start:enter()
+
+    lg.setBackgroundColor(Colors[2])
+
+end
+
+function start:resume()
 
     lg.setBackgroundColor(Colors[2])
 

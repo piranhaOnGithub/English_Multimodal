@@ -5,6 +5,7 @@
 Bump        = require 'libs.bump'
 Camera      = require 'libs.camera'
 Class       = require 'libs.class'
+Easing      = require 'libs.easing'
 Inspect     = require 'libs.inspect'
 Lume        = require 'libs.lume'
 Resolution  = require 'libs.resolution'
@@ -13,11 +14,14 @@ Timer       = require 'libs.timer'
 
 -- [[ Packages ]]
 require 'src.shortcuts'
-require 'src.globals'
 require 'src.assets'
+require 'src.globals'
 
 -- [[ Classes ]]
 require 'src.class.Button'
+require 'src.class.Dialogue'
+require 'src.class.Player'
+require 'src.class.Tile'
 
 -- [[ States ]]
 States = {

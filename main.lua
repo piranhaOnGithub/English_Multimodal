@@ -91,4 +91,6 @@ love.keypressed = function(key)
         toggle.fullscreen = not toggle.fullscreen
         love.window.setFullscreen(toggle.fullscreen)
     end
+
+    LastKeyPress[key] = true
 end

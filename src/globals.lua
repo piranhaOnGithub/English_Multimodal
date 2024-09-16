@@ -6,6 +6,7 @@ WIN_WIDTH, WIN_HEIGHT = lg.getDimensions()
 VIRT_WIDTH  = 800
 VIRT_HEIGHT = 600
 
+LastKeyPress = {}
 
 local function makeFont(path)
     return setmetatable({}, {
