@@ -17,7 +17,7 @@ function game:enter()
 
     -- Tiles
     self.map = {
-        Tile(100, 400, self.world, 1),
+        Tile(100, 400, self.world, 'tile'),
         Tile(140, 360, self.world, 1)
     }
 

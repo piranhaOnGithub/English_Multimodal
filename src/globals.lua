@@ -6,6 +6,8 @@ WIN_WIDTH, WIN_HEIGHT = lg.getDimensions()
 VIRT_WIDTH  = 800
 VIRT_HEIGHT = 600
 
+TILE_SIZE = 40
+
 LastKeyPress = {}
 
 local function makeFont(path)

@@ -10,6 +10,7 @@ function Player:init(x, y, world)
     self.dx     = 0
     self.dy     = 0
     self.speed  = 80
+    self.name   = 'player'
     self.world  = world
 
     self.world:add(self, self.x, self.y, self.w, self.h)
@@ -24,8 +25,8 @@ function Player:update(dt)
         self.dx = self.dx + 0.3
     end
 
-    if LastKeyPress['up'] then
-        self.dy = -160
+    if LastKeyPress['up'] and self.dy == 0.2 then
+        self.dy = -3
     end
 
     -- Apply velocity
@@ -34,9 +35,16 @@ function Player:update(dt)
     self.x, self.y, cols, len = self.world:move(
         self,
         self.x + self.dx * self.speed * dt,
-        self.y + self.dy * dt,
+        self.y + self.dy * self.speed * dt,
         nil
     )
+
+    for i = 1, len do
+        local col = cols[i].other
+        if col.name == 'tile' and col.x < self.x + self.w and col.x + TILE_SIZE > self.x then
+            self.dy = 0.1
+        end
+    end
 
     -- Apply friction
     if self.dx < -0.1 then
@@ -48,7 +56,7 @@ function Player:update(dt)
     end
 
     -- Apply gravity
-    self.dy = math.min(self.dy + 5, 300)
+    self.dy = math.min(self.dy + 0.1, 300)
 end
 
 function Player:render()
