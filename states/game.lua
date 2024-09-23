@@ -6,20 +6,27 @@ function game:init()
     self.buttons = {
         Button(210, 130, 70, 20, 'Back', function()
             State.switch(States.start)
-        end)
+        end),
+        Button(410, 130, 70, 20, 'Settings', function()
+            State.push(States.config)
+        end),
     }
 end
 
 function game:enter()
 
+    local levelthemake = require 'src.levelmaker'
+
     -- Create a fresh world
-    self.world = Bump.newWorld(50)
+    self.world = Bump.newWorld(TILE_SIZE)
+
+    levelthemake(self.world)
 
     -- Tiles
-    self.map = {
-        Tile(100, 400, self.world, 'tile'),
-        Tile(140, 360, self.world, 1)
-    }
+    -- self.map = {
+    --     Tile(100, 400, self.world, 'tile'),
+    --     Tile(140, 360, self.world, 1)
+    -- }
 
     self.text = {
         [1] = Dialogue('I am number one!'),
@@ -31,6 +38,10 @@ function game:enter()
 
     lg.setBackgroundColor(Colors[4])
 
+end
+
+function game:resume()
+    lg.setBackgroundColor(Colors[4])
 end
 
 function game:update(dt)
@@ -64,8 +75,13 @@ end
 
 function game:draw()
 
-    for _, t in ipairs(self.map) do
-        t:render()
+    local items, len = self.world:getItems()
+
+    for i = 1, len do
+        local item = items[i]
+        if item.name == 'tile' then
+            item:render(item)
+        end
     end
 
     self.player:render()

@@ -4,7 +4,7 @@ function start:init()
     self.num = 1
     self.buttons = {
         Button(VIRT_WIDTH / 2 - 50, VIRT_HEIGHT / 2 - 15, 100, 30, 'game', function()
-            State.switch(States.intro)
+            State.switch(States.game)
         end),
         Button(VIRT_WIDTH / 2 - 50, VIRT_HEIGHT / 2 + 30, 100, 30, 'settings', function()
             State.push(States.config)
