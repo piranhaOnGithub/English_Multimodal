@@ -21,7 +21,7 @@ function Dialogue:trigger()
 end
 
 function Dialogue:render()
-    lg.setColor(Colors[1])
+    lg.setColor(Colors[4])
     lg.rectangle('fill', 0, self.y, VIRT_WIDTH, self.h)
 
     lg.setFont(Fonts.monospace[14])

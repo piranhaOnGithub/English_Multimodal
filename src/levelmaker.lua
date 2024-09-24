@@ -29,7 +29,6 @@ local function levelmaker(world)
         local raw_map = raw_data[map]
         for y = 1, #raw_map do
             for x = 1, #raw_map[y] do
-                print(Inspect(raw_map[y][x]))
                 if raw_map[y][x] == 1 then
                     Tile(
                         (x - 1) * TILE_SIZE,

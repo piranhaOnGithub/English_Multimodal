@@ -4,7 +4,7 @@ function start:init()
     self.num = 1
     self.buttons = {
         Button(VIRT_WIDTH / 2 - 50, VIRT_HEIGHT / 2 - 15, 100, 30, 'game', function()
-            State.switch(States.game)
+            State.switch(States.intro)
         end),
         Button(VIRT_WIDTH / 2 - 50, VIRT_HEIGHT / 2 + 30, 100, 30, 'settings', function()
             State.push(States.config)
@@ -17,13 +17,13 @@ end
 
 function start:enter()
 
-    lg.setBackgroundColor(Colors[2])
+    lg.setBackgroundColor(Colors[3])
 
 end
 
 function start:resume()
 
-    lg.setBackgroundColor(Colors[2])
+    lg.setBackgroundColor(Colors[3])
 
 end
 

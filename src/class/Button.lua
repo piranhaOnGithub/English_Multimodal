@@ -37,17 +37,17 @@ end
 
 function Button:render()
     -- hitbox, purple, transparent
-    love.graphics.setColor(Colors[5])
+    love.graphics.setColor(Colors[4])
     love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
 
     -- text
     love.graphics.setFont(Fonts.default[15])
-    love.graphics.setColor(Colors[8])
+    love.graphics.setColor(Colors[7])
     love.graphics.printf(tostring(self.t), self.x, self.y + self.h / 4, self.w, "center")
 
     -- Show whether the mouse is over the Button
     if self.over then
-        love.graphics.setColor(Colors[6])
+        love.graphics.setColor(Colors[2])
         love.graphics.setLineWidth(2)
         love.graphics.rectangle("line", self.x, self.y, self.w, self.h)
     end

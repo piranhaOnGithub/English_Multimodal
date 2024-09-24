@@ -36,12 +36,12 @@ function game:enter()
     -- Player
     self.player = Player(100, 300, self.world)
 
-    lg.setBackgroundColor(Colors[4])
+    lg.setBackgroundColor(Colors[16])
 
 end
 
 function game:resume()
-    lg.setBackgroundColor(Colors[4])
+    lg.setBackgroundColor(Colors[16])
 end
 
 function game:update(dt)

@@ -60,6 +60,6 @@ function Player:update(dt)
 end
 
 function Player:render()
-    lg.setColor(Colors[6])
+    lg.setColor(Colors[8])
     lg.rectangle('line', self.x, self.y, self.w, self.h)
 end

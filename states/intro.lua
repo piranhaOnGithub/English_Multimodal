@@ -7,14 +7,15 @@ function intro:init()
         'Wake up...',
         'Hello world, this is the last message',
     }
-    self.count = 1
-    self.transparency = 0
-    self.destination = 1
 end
 
 function intro:enter()
 
-    lg.setBackgroundColor(Colors[1])
+    self.count = 1
+    self.transparency = 0
+    self.destination = 1
+
+    lg.setBackgroundColor(Colors[4])
 
     Timer.every(2, function()
         Timer.tween(1, {
@@ -43,7 +44,7 @@ function intro:update(dt)
 end
 
 function intro:keypressed(key, code)
-
+    State.switch(States.game)
 end
 
 function intro:mousepressed(x, y, mbutton)
@@ -52,7 +53,7 @@ end
 
 function intro:draw()
     lg.setFont(Fonts.monospace[20])
-    lg.setColor(Colors[8][1], Colors[8][2], Colors[8][3], self.transparency)
+    lg.setColor(Colors[5][1], Colors[5][2], Colors[5][3], self.transparency)
     lg.printf(self.text[math.min(self.count, #self.text)], 0, VIRT_HEIGHT / 2, VIRT_WIDTH, 'center')
 end
 

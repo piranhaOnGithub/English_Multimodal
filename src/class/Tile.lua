@@ -13,6 +13,6 @@ function Tile:init(x, y, world, t)
 end
 
 function Tile:render()
-    lg.setColor(Colors[1])
+    lg.setColor(Colors[13])
     lg.rectangle('fill', self.x, self.y, TILE_SIZE, TILE_SIZE)
 end
