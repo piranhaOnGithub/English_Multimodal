@@ -44,6 +44,7 @@ function intro:update(dt)
 end
 
 function intro:keypressed(key, code)
+    Timer.clear()
     State.switch(States.game)
 end
 

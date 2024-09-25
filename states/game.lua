@@ -33,6 +33,9 @@ function game:enter()
     levelGen(self)
 
     -- Player
+
+    --[[ THE PLAYER KEEPS TELEPORTING BACK TO THE
+            INITIAL SPAWN POSITION AFTER A DELAY ]]
     self.player = Player(100, 300, self.world)
 
     lg.setBackgroundColor(Colors[16])
@@ -89,10 +92,12 @@ function game:draw()
 
     self.player:render()
 
-    lg.setColor(Colors[10])
-    for i = 1, #self.map['info'] do
-        local info = self.map['info'][i]
-        lg.rectangle('line', info.x * TILE_SIZE, info.y * TILE_SIZE, info.w * TILE_SIZE, info.h * TILE_SIZE)
+    if DEBUG then
+        lg.setColor(Colors[10])
+        for i = 1, #self.map['info'] do
+            local info = self.map['info'][i]
+            lg.rectangle('line', info.x * TILE_SIZE, info.y * TILE_SIZE, info.w * TILE_SIZE, info.h * TILE_SIZE)
+        end
     end
 
     self.camera:detach()
