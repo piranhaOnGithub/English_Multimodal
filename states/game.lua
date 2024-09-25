@@ -11,27 +11,26 @@ function game:init()
             State.push(States.config)
         end),
     }
-end
-
-function game:enter()
-
-    local levelthemake = require 'src.levelmaker'
-
-    -- Create a fresh world
-    self.world = Bump.newWorld(TILE_SIZE)
-
-    levelthemake(self.world)
-
-    -- Tiles
-    -- self.map = {
-    --     Tile(100, 400, self.world, 'tile'),
-    --     Tile(140, 360, self.world, 1)
-    -- }
 
     self.text = {
         [1] = Dialogue('I am number one!'),
         [2] = Dialogue('I am also definitely number one as well also')
     }
+
+    self.camera = Camera.new(0, 0, 0.5)
+end
+
+function game:enter()
+
+    local levelGen = require 'src.levelmaker'
+
+    -- Create a fresh world
+    self.world = Bump.newWorld(TILE_SIZE)
+    self.map = {
+        ['info'] = {}
+    }
+
+    levelGen(self)
 
     -- Player
     self.player = Player(100, 300, self.world)
@@ -50,9 +49,11 @@ function game:update(dt)
 
     Timer.update(dt)
 
-    for _, b in ipairs(self.buttons) do
-        b:update(dt)
-    end
+    -- for _, b in ipairs(self.buttons) do
+    --     b:update(dt)
+    -- end
+
+    self.camera:lookAt(self.player.x, self.player.y)
 
     LastKeyPress = {}
 end
@@ -67,13 +68,15 @@ end
 
 function game:mousepressed(x, y, mbutton)
 
-    local mx, my = Resolution.toGame(x, y)
-    for _, b in ipairs(self.buttons) do
-        b:click(mx, my, mbutton)
-    end
+    -- local mx, my = Resolution.toGame(x, y)
+    -- for _, b in ipairs(self.buttons) do
+    --     b:click(mx, my, mbutton)
+    -- end
 end
 
 function game:draw()
+
+    self.camera:attach(0, 0, VIRT_WIDTH, VIRT_HEIGHT)
 
     local items, len = self.world:getItems()
 
@@ -86,9 +89,17 @@ function game:draw()
 
     self.player:render()
 
-    for _, b in ipairs(self.buttons) do
-        b:render()
+    lg.setColor(Colors[10])
+    for i = 1, #self.map['info'] do
+        local info = self.map['info'][i]
+        lg.rectangle('line', info.x * TILE_SIZE, info.y * TILE_SIZE, info.w * TILE_SIZE, info.h * TILE_SIZE)
     end
+
+    self.camera:detach()
+
+    -- for _, b in ipairs(self.buttons) do
+    --     b:render()
+    -- end
 
     for _, d in ipairs(self.text) do
         d:render()
