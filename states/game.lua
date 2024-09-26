@@ -1,5 +1,19 @@
 local game = {}
 
+local function removeTiles(self, array)
+    for i = 1, #self.map[array] do
+        local item = self.map[array][i]
+        self.world:remove(item)
+    end
+end
+
+local function summonTiles(self, array)
+    for i = 1, #self.map[array] do
+        local item = self.map[array][i]
+        self.world:add(item, item.x, item.y, TILE_SIZE, TILE_SIZE)
+    end
+end
+
 function game:init()
 
     -- Intitiate buttons
@@ -17,7 +31,7 @@ function game:init()
         [2] = Dialogue('I am also definitely number one as well also')
     }
 
-    self.camera = Camera.new(0, 0, 0.5)
+    self.camera = Camera.new(0, 0, 1.6)
 end
 
 function game:enter()
@@ -33,7 +47,7 @@ function game:enter()
     levelGen(self)
 
     -- Player
-    self.player = Player(100, 300, self.world)
+    self.player = Player(20 * TILE_SIZE, 300, self.world)
 
     lg.setBackgroundColor(Colors[16])
 
@@ -59,10 +73,14 @@ function game:update(dt)
 end
 
 function game:keypressed(key, code)
-    if key == '1' then
-        self.text[1]:trigger()
-    elseif key == '2' then
-        self.text[2]:trigger()
+    if key == 'kp1' then
+        self.text[1]:trigger(function()
+            removeTiles(self, 1)
+        end)
+    elseif key == 'kp2' then
+        self.text[2]:trigger(function()
+            summonTiles(self, 1)
+        end)
     end
 end
 

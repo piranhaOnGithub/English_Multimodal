@@ -8,6 +8,7 @@ local raw_data = {
             y = 0,
             w = 20,
             h = 15,
+            remove = true,
         },
         level   = {
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -73,6 +74,13 @@ local function levelmaker(self)
                         self.world,
                         2))
                 end
+            end
+        end
+
+        -- Some levels are spawned in later
+        if info.remove then
+            for i = 1, #current_map do
+                self.world:remove(current_map[i])
             end
         end
         self.map[map] = current_map

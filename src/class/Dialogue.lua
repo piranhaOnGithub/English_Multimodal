@@ -8,12 +8,20 @@ function Dialogue:init(text)
     self.t = tostring(text)
 end
 
-function Dialogue:trigger()
+function Dialogue:trigger(func)
     if self.y == VIRT_HEIGHT then
+        -- Tween in
         Timer.tween(0.5, {
             [self] = { y = VIRT_HEIGHT - self.h}
         }) : ease(Easing.outExpo)
+
+        -- Run function (if passed)
+        local status, err = pcall(func)
+        if not status then
+            print(err)
+        end
     elseif self.y == VIRT_HEIGHT - self.h then
+        -- Tween out
         Timer.tween(0.5, {
             [self] = { y = VIRT_HEIGHT}
         }) : ease(Easing.inExpo)
