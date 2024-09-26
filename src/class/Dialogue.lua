@@ -10,11 +10,11 @@ end
 
 function Dialogue:trigger()
     if self.y == VIRT_HEIGHT then
-        Timer.tween(1, {
+        Timer.tween(0.5, {
             [self] = { y = VIRT_HEIGHT - self.h}
         }) : ease(Easing.outExpo)
     elseif self.y == VIRT_HEIGHT - self.h then
-        Timer.tween(1, {
+        Timer.tween(0.5, {
             [self] = { y = VIRT_HEIGHT}
         }) : ease(Easing.inExpo)
     end

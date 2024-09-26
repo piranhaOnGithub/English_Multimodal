@@ -33,9 +33,6 @@ function game:enter()
     levelGen(self)
 
     -- Player
-
-    --[[ THE PLAYER KEEPS TELEPORTING BACK TO THE
-            INITIAL SPAWN POSITION AFTER A DELAY ]]
     self.player = Player(100, 300, self.world)
 
     lg.setBackgroundColor(Colors[16])
