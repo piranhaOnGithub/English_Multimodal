@@ -19,7 +19,7 @@ require 'src.globals'
 
 -- [[ Classes ]]
 require 'src.class.Button'
-require 'src.class.Dialogue'
+require 'src.class.Trigger'
 require 'src.class.Player'
 require 'src.class.Tile'
 

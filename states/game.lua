@@ -26,12 +26,7 @@ function game:init()
         end),
     }
 
-    self.text = {
-        [1] = Dialogue('I am number one!'),
-        [2] = Dialogue('I am also definitely number one as well also')
-    }
-
-    self.camera = Camera.new(0, 0, 1.6)
+    self.camera = Camera.new(0, 0, 1.5)
 end
 
 function game:enter()
@@ -43,11 +38,34 @@ function game:enter()
     self.map = {
         ['info'] = {}
     }
+    self.triggers = {
+        [1] = Trigger('I am number one!', 33 * TILE_SIZE, 0, 6 * TILE_SIZE, self.world),
+        [2] = Trigger('I am also definitely number one as well also', 10 * TILE_SIZE, 0, 6 * TILE_SIZE, self.world)
+    }
+    self.actions = {
+        [1] = function()
+            removeTiles(self, 2)
+            summonTiles(self, 3)
+            self.triggers[2].active = true
+        end,
+        [2] = function ()
+            removeTiles(self, 3)
+            summonTiles(self, 2)
+        end
+    }
+
+    -- Add functions
+    for i = 1, math.min(#self.triggers, #self.actions) do
+        self.triggers[i].func = self.actions[i]
+    end
+
+    -- First trigger is active
+    self.triggers[1].active = true
 
     levelGen(self)
 
     -- Player
-    self.player = Player(20 * TILE_SIZE, 300, self.world)
+    self.player = Player(0, 0, self.world)
 
     lg.setBackgroundColor(Colors[16])
 
@@ -67,20 +85,27 @@ function game:update(dt)
     --     b:update(dt)
     -- end
 
-    self.camera:lookAt(self.player.x, self.player.y)
+    self.camera:lookAt(self.player.x + self.player.w / 2, self.player.y + self.player.h / 2)
 
     LastKeyPress = {}
 end
 
 function game:keypressed(key, code)
     if key == 'kp1' then
-        self.text[1]:trigger(function()
-            removeTiles(self, 1)
+        self.triggers[1]:trigger(function()
+            removeTiles(self, 2)
+            summonTiles(self, 3)
         end)
     elseif key == 'kp2' then
-        self.text[2]:trigger(function()
-            summonTiles(self, 1)
+        self.triggers[2]:trigger(function()
+            removeTiles(self, 3)
+            summonTiles(self, 2)
         end)
+    end
+    if DEBUG then
+        self.camera:zoomTo(0.25)
+    else
+        self.camera:zoomTo(1.5)
     end
 end
 
@@ -113,6 +138,13 @@ function game:draw()
             local info = self.map['info'][i]
             lg.rectangle('line', info.x * TILE_SIZE, info.y * TILE_SIZE, info.w * TILE_SIZE, info.h * TILE_SIZE)
         end
+        lg.setColor(Colors[9])
+        for i = 1, #self.triggers do
+            local hit = self.triggers[i]
+            if hit.active then
+                lg.line(hit.x, hit.y, hit.x, hit.y + hit.h)
+            end
+        end
     end
 
     self.camera:detach()
@@ -121,7 +153,7 @@ function game:draw()
     --     b:render()
     -- end
 
-    for _, d in ipairs(self.text) do
+    for _, d in ipairs(self.triggers) do
         d:render()
     end
 end

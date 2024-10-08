@@ -5,6 +5,8 @@ local toggle = {
 
 love.load = function()
 
+    love.graphics.setDefaultFilter('nearest', 'nearest')
+
     -- Load all dependencies
     require 'src.dependencies'
 
@@ -16,6 +18,7 @@ love.load = function()
         bars    = true
     })
     Resolution.nearestFilter(true)
+    Resolution.pixelPerfectOffsetsHack = true
 
     -- Set a random seed
     math.randomseed(os.time())

@@ -9,7 +9,7 @@ function Player:init(x, y, world)
     self.h      = 30
     self.dx     = 0
     self.dy     = 0
-    self.speed  = 80
+    self.speed  = 190
     self.name   = 'player'
     self.world  = world
 
@@ -36,13 +36,18 @@ function Player:update(dt)
         self,
         self.x + self.dx * self.speed * dt,
         self.y + self.dy * self.speed * dt,
-        nil
+        function(self, other)
+            if other.name == 'tile' then return 'slide' end
+            if other.name == 'trigger' then return 'cross' end
+        end
     )
 
     for i = 1, len do
         local col = cols[i].other
         if col.name == 'tile' and col.x < self.x + self.w and col.x + TILE_SIZE > self.x then
             self.dy = 0.1
+        elseif col.name == 'trigger' and col.active then
+            col:trigger(nil)
         end
     end
 
