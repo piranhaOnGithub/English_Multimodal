@@ -30,6 +30,9 @@ function config:mousepressed(x, y, mbutton)
 end
 
 function config:draw()
+
+    Resolution.start()
+
     lg.setColor(Colors[1])
     lg.setFont(Fonts.monospace[24])
     lg.printf("Settings", 0, VIRT_HEIGHT / 2, VIRT_WIDTH, 'center')
@@ -37,6 +40,8 @@ function config:draw()
     for _, b in ipairs(self.buttons) do
         b:render()
     end
+
+    Resolution.stop()
 end
 
 return config

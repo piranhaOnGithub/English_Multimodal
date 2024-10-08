@@ -27,6 +27,7 @@ function game:init()
     }
 
     self.camera = Camera.new(0, 0, 1.5)
+    self.canvas = lg.newCanvas(VIRT_WIDTH, VIRT_HEIGHT)
 end
 
 function game:enter()
@@ -38,10 +39,13 @@ function game:enter()
     self.map = {
         ['info'] = {}
     }
+
+    -- Add triggers
     self.triggers = {
         [1] = Trigger('I am number one!', 33 * TILE_SIZE, 0, 6 * TILE_SIZE, self.world),
         [2] = Trigger('I am also definitely number one as well also', 10 * TILE_SIZE, 0, 6 * TILE_SIZE, self.world)
     }
+    -- Add actions
     self.actions = {
         [1] = function()
             removeTiles(self, 2)
@@ -53,8 +57,7 @@ function game:enter()
             summonTiles(self, 2)
         end
     }
-
-    -- Add functions
+    -- Add actions to triggers
     for i = 1, math.min(#self.triggers, #self.actions) do
         self.triggers[i].func = self.actions[i]
     end
@@ -119,7 +122,17 @@ end
 
 function game:draw()
 
+    -- Camera is drawn to canvas, then scaled
+
+    lg.setColor(1, 1, 1, 1)
+
     self.camera:attach(0, 0, VIRT_WIDTH, VIRT_HEIGHT)
+
+    -- Begin canvas
+    lg.setCanvas(self.canvas)
+
+    -- Clear the canvas
+    love.graphics.clear(0, 0, 0, 0)
 
     local items, len = self.world:getItems()
 
@@ -147,15 +160,26 @@ function game:draw()
         end
     end
 
+    -- End canvas
+    lg.setCanvas()
+
     self.camera:detach()
 
     -- for _, b in ipairs(self.buttons) do
     --     b:render()
     -- end
 
+    -- Scaling starts here
+    Resolution.start()
+
+    lg.setColor(1, 1, 1, 1)
+    lg.draw(self.canvas, 0, 0)
+
     for _, d in ipairs(self.triggers) do
         d:render()
     end
+
+    Resolution.stop()
 end
 
 return game

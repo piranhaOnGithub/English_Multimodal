@@ -43,12 +43,8 @@ love.resize = function(w, h)
 end
 
 love.draw = function()
-    -- Scale current state to window
-    Resolution.start()
-
+    -- Scale current state to window later
     State.current():draw()
-
-    Resolution.stop()
 
     -- DEBUGGING
     if DEBUG then

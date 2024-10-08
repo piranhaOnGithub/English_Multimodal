@@ -53,9 +53,14 @@ function intro:mousepressed(x, y, mbutton)
 end
 
 function intro:draw()
+
+    Resolution.start()
+
     lg.setFont(Fonts.monospace[20])
     lg.setColor(Colors[5][1], Colors[5][2], Colors[5][3], self.transparency)
     lg.printf(self.text[math.min(self.count, #self.text)], 0, VIRT_HEIGHT / 2, VIRT_WIDTH, 'center')
+
+    Resolution.stop()
 end
 
 return intro

@@ -45,9 +45,14 @@ function start:mousepressed(x, y, mbutton)
 end
 
 function start:draw()
+
+    Resolution.start()
+
     for _, b in ipairs(self.buttons) do
         b:render()
     end
+
+    Resolution.stop()
 end
 
 return start
