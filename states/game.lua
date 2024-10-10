@@ -26,7 +26,7 @@ function game:init()
         end),
     }
 
-    self.camera = Camera.new(0, 0, 1.5)
+    self.camera = Camera.new(0, 0, 1)
     self.canvas = lg.newCanvas(VIRT_WIDTH, VIRT_HEIGHT)
 end
 
@@ -106,9 +106,9 @@ function game:keypressed(key, code)
         end)
     end
     if DEBUG then
-        self.camera:zoomTo(0.25)
+        self.camera:zoomTo(0.5)
     else
-        self.camera:zoomTo(1.5)
+        self.camera:zoomTo(2)
     end
 end
 
@@ -123,9 +123,6 @@ end
 function game:draw()
 
     -- Camera is drawn to canvas, then scaled
-
-    lg.setColor(1, 1, 1, 1)
-
     self.camera:attach(0, 0, VIRT_WIDTH, VIRT_HEIGHT)
 
     -- Begin canvas
@@ -133,6 +130,8 @@ function game:draw()
 
     -- Clear the canvas
     love.graphics.clear(0, 0, 0, 0)
+
+    lg.setColor(1, 1, 1, 1)
 
     local items, len = self.world:getItems()
 

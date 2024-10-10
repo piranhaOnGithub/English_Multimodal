@@ -5,11 +5,11 @@ Player = Class{}
 function Player:init(x, y, world)
     self.x      = x
     self.y      = y
-    self.w      = 20
-    self.h      = 30
+    self.w      = 10
+    self.h      = 15
     self.dx     = 0
     self.dy     = 0
-    self.speed  = 190
+    self.speed  = 100
     self.name   = 'player'
     self.world  = world
 

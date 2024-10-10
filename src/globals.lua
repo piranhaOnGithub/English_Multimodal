@@ -5,7 +5,7 @@ DEBUG = true
 VIRT_WIDTH  = 800
 VIRT_HEIGHT = 600
 
-TILE_SIZE = 40
+TILE_SIZE = 30
 
 LastKeyPress = {}
 
