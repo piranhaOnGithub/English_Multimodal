@@ -65,6 +65,55 @@ function Player:update(dt)
 end
 
 function Player:render()
-    lg.setColor(Colors[8])
-    lg.rectangle('line', self.x, self.y, self.w, self.h)
+
+
+    if DEBUG then
+        lg.setColor(Colors[9])
+        lg.rectangle('line', self.x, self.y, self.w, self.h)
+    else
+
+        -- Player walk animation
+
+        -- Body
+        lg.setColor(Colors[4])
+        lg.rectangle('fill', self.x + 2, self.y, 6, 8)
+
+        -- Leg
+        lg.push()
+        -- lg.setColor(Colors[9])
+        lg.translate(self.x + 3.5, self.y + 7)
+        lg.rotate((math.cos(lt.getTime() * 8) * (self.dx * 0.8)) % (math.pi * 2))
+        lg.rectangle('fill', -1.5, 0, 3, 8)
+        lg.pop()
+
+        -- Other leg
+        lg.push()
+        -- lg.setColor(Colors[10])
+        lg.translate(self.x + 6.5, self.y + 7)
+        lg.rotate((math.cos(lt.getTime() * 8) * (-self.dx * 0.8)) % (math.pi * 2))
+        lg.rectangle('fill', -1.5, 0, 3, 8)
+        lg.pop()
+
+        -- Arm
+        lg.push()
+        -- lg.setColor(Colors[14])
+        lg.translate(self.x + 3, self.y)
+        lg.rotate(((math.cos(lt.getTime() * 8) * -self.dx) % (math.pi * 2)) + 0.1)
+        lg.rectangle('fill', -1.5, 0, 3, 7)
+        lg.pop()
+
+        -- Other arm
+        lg.push()
+        -- lg.setColor(Colors[15])
+        lg.translate(self.x + 7, self.y)
+        lg.rotate(((math.cos(lt.getTime() * 8) * self.dx) % (math.pi * 2)) - 0.1)
+        lg.rectangle('fill', -1.5, 0, 3, 7)
+        lg.pop()
+
+        -- Head
+        lg.push()
+        lg.translate(self.x + self.w / 2, self.y - 3)
+        lg.circle('fill', 0, 0, 4)
+        lg.pop()
+    end
 end
