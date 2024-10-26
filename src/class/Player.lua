@@ -37,15 +37,27 @@ function Player:update(dt)
         self.x + self.dx * self.speed * dt,
         self.y + self.dy * self.speed * dt,
         function(self, other)
-            if other.name == 'tile' then return 'slide' end
+            if other.name == 'tile' then
+                if other.t <= 28 then return 'slide' end
+                if other.t == 29 then return 'cross' end
+            end
             if other.name == 'trigger' then return 'cross' end
         end
     )
 
     for i = 1, len do
         local col = cols[i].other
-        if col.name == 'tile' and col.x < self.x + self.w and col.x + TILE_SIZE > self.x then
-            self.dy = 0.1
+        if col.name == 'tile' then
+            if col.t <= 28 and col.x < self.x + self.w and col.x + TILE_SIZE > self.x then
+                self.dy = 0.1
+            elseif col.t == 29 then
+                if lk.isDown('up') then
+                    self.dy = -0.8
+                    self.dx = 0
+                    self.x = Lume.lerp(self.x, -self.w / 2 + col.x + TILE_SIZE / 2, 0.03)
+                end
+                self.dy = Lume.clamp(self.dy, -0.8, 0.8)
+            end
         elseif col.name == 'trigger' and col.active then
             col:trigger(nil)
         end
@@ -76,7 +88,7 @@ function Player:render()
 
         -- Body
         lg.setColor(Colors[4])
-        lg.rectangle('fill', self.x + 2, self.y, 6, 8)
+        lg.rectangle('fill', self.x + 2.5, self.y, 5, 8)
 
         -- Leg
         lg.push()

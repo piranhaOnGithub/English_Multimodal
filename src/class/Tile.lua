@@ -9,7 +9,12 @@ function Tile:init(x, y, world, t)
     self.name   = 'tile'
     self.world  = world
 
-    self.world:add(self, self.x, self.y, TILE_SIZE, TILE_SIZE)
+    -- Set a custom hitbox for special tiles
+    if self.t > 0 and self.t <= 28 then
+        self.world:add(self, self.x, self.y, TILE_SIZE, TILE_SIZE)
+    elseif self.t == 29 then
+        self.world:add(self, self.x + TILE_SIZE / 5, self.y, TILE_SIZE / 2.5, TILE_SIZE)
+    end
 end
 
 function Tile:render()
