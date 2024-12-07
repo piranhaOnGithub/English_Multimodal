@@ -10,10 +10,14 @@ function Tile:init(x, y, world, t)
     self.world  = world
 
     -- Set a custom hitbox for special tiles
-    if self.t > 0 and self.t <= 28 then
+    if self.t > 0 and self.t <= 28 then -- normal
         self.world:add(self, self.x, self.y, TILE_SIZE, TILE_SIZE)
-    elseif self.t == 29 then
+    elseif self.t == 29 then -- ladder
         self.world:add(self, self.x + TILE_SIZE / 5, self.y, TILE_SIZE / 2.5, TILE_SIZE)
+    elseif self.t == 30 then -- fence left
+        self.world:add(self, self.x + TILE_SIZE / 5, self.y - TILE_SIZE, TILE_SIZE / 5, TILE_SIZE * 2)
+    elseif self.t == 31 then -- fence right
+        self.world:add(self, self.x + TILE_SIZE - TILE_SIZE / 2.5, self.y - TILE_SIZE, TILE_SIZE / 5, TILE_SIZE * 2)
     end
 end
 

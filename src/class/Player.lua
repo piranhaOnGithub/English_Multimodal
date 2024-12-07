@@ -9,7 +9,7 @@ function Player:init(x, y, world)
     self.h      = 15
     self.dx     = 0
     self.dy     = 0
-    self.speed  = 100
+    self.speed  = 90
     self.name   = 'player'
     self.world  = world
 
@@ -25,7 +25,7 @@ function Player:update(dt)
         self.dx = self.dx + 0.3
     end
 
-    if LastKeyPress['up'] and self.dy == 0.2 then
+    if LastKeyPress['up'] and self.dy == 0.25 then
         self.dy = -3
     end
 
@@ -40,6 +40,7 @@ function Player:update(dt)
             if other.name == 'tile' then
                 if other.t <= 28 then return 'slide' end
                 if other.t == 29 then return 'cross' end
+                if other.t >= 30 then return 'slide' end
             end
             if other.name == 'trigger' then return 'cross' end
         end
@@ -73,7 +74,7 @@ function Player:update(dt)
     end
 
     -- Apply gravity
-    self.dy = math.min(self.dy + 0.1, 300)
+    self.dy = math.min(self.dy + 0.15, 300)
 end
 
 function Player:render()
@@ -82,6 +83,8 @@ function Player:render()
     if DEBUG then
         lg.setColor(Colors[9])
         lg.rectangle('line', self.x, self.y, self.w, self.h)
+        lg.setFont(Fonts.monospace[50])
+        lg.print(math.floor(self.x / TILE_SIZE) .. ', ' .. math.floor(self.y / TILE_SIZE), self.x, self.y - 50)
     else
 
         -- Player walk animation

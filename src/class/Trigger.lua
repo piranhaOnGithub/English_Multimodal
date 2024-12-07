@@ -24,29 +24,42 @@ function Trigger:trigger(func)
         -- Make sure we can't spam it
         self.active = false
 
-        -- Tween in
-        Timer.tween(0.5, {
-            [self] = { text_y = VIRT_HEIGHT - self.text_h}
-        }) : ease(Easing.outExpo)
+        if self.t == 'nil' or self.t == '' then
+            -- Run function (if passed)
+            local script = func
+            if func == nil then
+                script = self.func
+            end
 
-        -- Run function (if passed)
-        local script = func
-        if func == nil then
-            script = self.func
-        end
-
-        local status, err = pcall(script)
-        if not status then
-            print(err)
-        end
-
-        -- Wait
-        Timer.after(8, function()
-            -- Tween out
+            local status, err = pcall(script)
+            if not status then
+                print(err)
+            end
+        else
+            -- Tween in
             Timer.tween(0.5, {
-                [self] = { text_y = VIRT_HEIGHT}
-            }) : ease(Easing.inExpo)
-        end)
+                [self] = { text_y = VIRT_HEIGHT - self.text_h}
+            }) : ease(Easing.outExpo)
+
+            -- Run function (if passed)
+            local script = func
+            if func == nil then
+                script = self.func
+            end
+
+            local status, err = pcall(script)
+            if not status then
+                print(err)
+            end
+
+            -- Wait
+            Timer.after(8, function()
+                -- Tween out
+                Timer.tween(0.5, {
+                    [self] = { text_y = VIRT_HEIGHT}
+                }) : ease(Easing.inExpo)
+            end)
+        end
     end
 end
 

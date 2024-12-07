@@ -10,7 +10,15 @@ end
 local function summonTiles(self, array)
     for i = 1, #self.map[array] do
         local item = self.map[array][i]
-        self.world:add(item, item.x, item.y, TILE_SIZE, TILE_SIZE)
+        if item.t > 0 and item.t <= 28 then -- normal
+            self.world:add(item, item.x, item.y, TILE_SIZE, TILE_SIZE)
+        elseif item.t == 29 then -- ladder
+            self.world:add(item, item.x + TILE_SIZE / 5, item.y, TILE_SIZE / 2.5, TILE_SIZE)
+        elseif item.t == 30 then -- fence left
+            self.world:add(item, item.x + TILE_SIZE / 5, item.y - TILE_SIZE, TILE_SIZE / 5, TILE_SIZE * 2)
+        elseif item.t == 31 then -- fence right
+            self.world:add(item, item.x + TILE_SIZE - TILE_SIZE / 2.5, item.y - TILE_SIZE, TILE_SIZE / 5, TILE_SIZE * 2)
+        end
     end
 end
 
@@ -42,8 +50,9 @@ function game:enter()
 
     -- Add triggers
     self.triggers = {
-        [1] = Trigger('I am number one!', 33 * TILE_SIZE, 0, 6 * TILE_SIZE, self.world),
-        [2] = Trigger('I am also definitely number one as well also', 10 * TILE_SIZE, 0, 6 * TILE_SIZE, self.world)
+        [1] = Trigger(nil, 40 * TILE_SIZE, 3 * TILE_SIZE, 3 * TILE_SIZE, self.world),
+        [2] = Trigger(nil, 34 * TILE_SIZE, -2 * TILE_SIZE, TILE_SIZE * 3, self.world),
+        [3] = Trigger(nil, 33 * TILE_SIZE, -2 * TILE_SIZE, TILE_SIZE * 3, self.world),
     }
     -- Add actions
     self.actions = {
@@ -53,8 +62,14 @@ function game:enter()
             self.triggers[2].active = true
         end,
         [2] = function ()
-            removeTiles(self, 3)
-            summonTiles(self, 2)
+            removeTiles(self, 7)
+            summonTiles(self, 8)
+            self.triggers[3].active = true
+        end,
+        [3] = function ()
+            removeTiles(self, 5)
+            summonTiles(self, 6)
+            self.triggers[3].active = true
         end
     }
     -- Add actions to triggers
@@ -68,7 +83,7 @@ function game:enter()
     levelGen(self)
 
     -- Player
-    self.player = Player(0, 0, self.world)
+    self.player = Player(TILE_SIZE * 30, 0, self.world)
 
     lg.setBackgroundColor(Colors[16])
 
@@ -88,7 +103,7 @@ function game:update(dt)
     --     b:update(dt)
     -- end
 
-    self.camera:lookAt(self.player.x + self.player.w / 2, self.player.y + self.player.h / 2)
+    self.camera:lookAt(self.player.x + self.player.w / 2, self.player.y - VIRT_HEIGHT / 20)
 
     LastKeyPress = {}
 end
@@ -137,7 +152,7 @@ function game:draw()
 
     for i = 1, len do
         local item = items[i]
-        if item.name == 'tile' then
+        if item.name == 'tile' and item.x + TILE_SIZE >= self.player.x - VIRT_WIDTH / 2 and item.x <= self.player.x + self.player.w + VIRT_WIDTH / 2 then
             item:render(item)
         end
     end
