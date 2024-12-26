@@ -22,6 +22,7 @@ require 'src.class.Button'
 require 'src.class.Trigger'
 require 'src.class.Player'
 require 'src.class.Tile'
+require 'src.class.Splash'
 
 -- [[ States ]]
 States = {

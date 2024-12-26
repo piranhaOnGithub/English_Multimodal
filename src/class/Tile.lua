@@ -22,9 +22,10 @@ function Tile:init(x, y, world, t)
 end
 
 function Tile:render()
-    lg.setColor(1, 1, 1, 1)
-    lg.draw(Graphics['tileset'], Graphics.tile[self.t], self.x, self.y, 0, 3, 3)
-    if DEBUG then
+    if not DEBUG then
+        lg.setColor(1, 1, 1, 1)
+        lg.draw(Graphics['tileset'], Graphics.tile[self.t], self.x, self.y, 0, 3, 3)
+    else
         lg.setColor(Colors[2])
         lg.rectangle('fill', self.x, self.y, TILE_SIZE, TILE_SIZE)
     end

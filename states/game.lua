@@ -34,8 +34,9 @@ function game:init()
         end),
     }
 
-    self.camera = Camera.new(0, 0, 1)
+    self.camera = Camera.new(0, 0, 2)
     self.canvas = lg.newCanvas(VIRT_WIDTH, VIRT_HEIGHT)
+    self.splash = Splash('potatato')
 end
 
 function game:enter()
@@ -44,33 +45,70 @@ function game:enter()
 
     -- Create a fresh world
     self.world = Bump.newWorld(TILE_SIZE)
-    self.map = {
-        ['info'] = {}
-    }
+    self.map = {['info'] = {}}
+    levelGen(self)
 
-    -- Add triggers
+    -- Add trigger locations
     self.triggers = {
-        [1] = Trigger(nil, 40 * TILE_SIZE, 3 * TILE_SIZE, 3 * TILE_SIZE, self.world),
-        [2] = Trigger(nil, 34 * TILE_SIZE, -2 * TILE_SIZE, TILE_SIZE * 3, self.world),
-        [3] = Trigger(nil, 33 * TILE_SIZE, -2 * TILE_SIZE, TILE_SIZE * 3, self.world),
+        [1]     = Trigger(-6, -1, TILE_SIZE * 3, self.world),
+        [2]     = Trigger(5, 0, TILE_SIZE * 3, self.world),
+        [3]     = Trigger(11, -2, TILE_SIZE * 3, self.world),
+        [4]     = Trigger(26, -2, TILE_SIZE * 3, self.world),
+        
+        -- [2]     = Trigger(40, 3, TILE_SIZE * 3, self.world),
+        -- [3]     = Trigger(34, -2, TILE_SIZE * 3, self.world),
+        -- [4]     = Trigger(33, -2, TILE_SIZE * 3, self.world),
+        -- [5]     = Trigger(70.5, 8.75, 1, self.world),
+        -- [6]     = Trigger(70.5, 10, 1, self.world),
     }
-    -- Add actions
+    -- Add trigger actions
     self.actions = {
         [1] = function()
-            removeTiles(self, 2)
-            summonTiles(self, 3)
+            self.splash:show('You have been here for as long as you can remember')
             self.triggers[2].active = true
         end,
-        [2] = function ()
-            removeTiles(self, 7)
-            summonTiles(self, 8)
+        [2] = function()
+            self.splash:show('This world...')
             self.triggers[3].active = true
         end,
-        [3] = function ()
-            removeTiles(self, 5)
-            summonTiles(self, 6)
-            self.triggers[3].active = true
-        end
+        [3] = function()
+            self.splash:show('...you still didn\'t really understand it')
+            self.triggers[4].active = true
+        end,
+        [4] = function()
+            self.splash:show('It challenged you at times')
+            self.triggers[5].active = true
+        end,
+        -- [2] = function()
+        --     -- Create ladder (parkour)
+        --     removeTiles(self, 2)
+        --     summonTiles(self, 3)
+        --     self.splash:show('Quas temporibus expedita iste consequuntur sapiente quaerat soluta omnis. Sint accusamus ad ab quos. Quibusdam ipsam soluta rerum sit eius. Quam nesciunt quis perferendis illum ipsa qui. Sequi nihil nam recusandae hic minima voluptatem saepe occaecati.')
+        --     self.triggers[3].active = true
+        -- end,
+        -- [3] = function()
+        --     -- Allow escape (parkour)
+        --     removeTiles(self, 1)
+        --     summonTiles(self, 8)
+        --     self.splash:show('Ford Beetle')
+        --     self.triggers[4].active = true
+        -- end,
+        -- [4] = function()
+        --     -- Create platform (parkour)
+        --     removeTiles(self, 5)
+        --     summonTiles(self, 6)
+        --     self.splash:show('Volkswagen 911')
+        --     self.triggers[5].active = true
+        -- end,
+        -- [5] = function()
+        --     -- Teleport player (ladder)
+        --     self.player.y = self.player.y + TILE_SIZE
+        --     self.triggers[6].active = true
+        -- end,
+        -- [6] = function()
+        --     -- Reset teleport (ladder)
+        --     self.triggers[5].active = true
+        -- end,
     }
     -- Add actions to triggers
     for i = 1, math.min(#self.triggers, #self.actions) do
@@ -80,13 +118,18 @@ function game:enter()
     -- First trigger is active
     self.triggers[1].active = true
 
-    levelGen(self)
-
     -- Player
-    self.player = Player(TILE_SIZE * 30, 0, self.world)
+    self.player = Player(TILE_SIZE * -9, TILE_SIZE, self.world)
 
     lg.setBackgroundColor(Colors[16])
 
+    -- Fade in
+    self.fade_in_opacity = 1
+    Timer.after(0.5, function()
+        Timer.tween(0.75, {
+            [self] = {fade_in_opacity = 0}
+        }) : ease(Easing.inOutSine)
+    end)
 end
 
 function game:resume()
@@ -97,11 +140,9 @@ function game:update(dt)
 
     self.player:update(dt)
 
-    Timer.update(dt)
+    self.splash:update(dt)
 
-    -- for _, b in ipairs(self.buttons) do
-    --     b:update(dt)
-    -- end
+    Timer.update(dt)
 
     self.camera:lookAt(self.player.x + self.player.w / 2, self.player.y - VIRT_HEIGHT / 20)
 
@@ -109,17 +150,11 @@ function game:update(dt)
 end
 
 function game:keypressed(key, code)
-    if key == 'kp1' then
-        self.triggers[1]:trigger(function()
-            removeTiles(self, 2)
-            summonTiles(self, 3)
-        end)
-    elseif key == 'kp2' then
-        self.triggers[2]:trigger(function()
-            removeTiles(self, 3)
-            summonTiles(self, 2)
-        end)
-    end
+    -- if key == 'kp1' then
+    --     self.triggers[1]:trigger()
+    -- elseif key == 'kp2' then
+    --     self.triggers[2]:trigger()
+    -- end
     if DEBUG then
         self.camera:zoomTo(0.5)
     else
@@ -176,12 +211,7 @@ function game:draw()
 
     -- End canvas
     lg.setCanvas()
-
     self.camera:detach()
-
-    -- for _, b in ipairs(self.buttons) do
-    --     b:render()
-    -- end
 
     -- Scaling starts here
     Resolution.start()
@@ -189,9 +219,10 @@ function game:draw()
     lg.setColor(1, 1, 1, 1)
     lg.draw(self.canvas, 0, 0)
 
-    for _, d in ipairs(self.triggers) do
-        d:render()
-    end
+    self.splash:render()
+
+    lg.setColor(Colors[4][1], Colors[4][2], Colors[4][3], self.fade_in_opacity)
+    lg.rectangle('fill', 0, 0, VIRT_WIDTH, VIRT_HEIGHT)
 
     Resolution.stop()
 end

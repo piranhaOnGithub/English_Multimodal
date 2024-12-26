@@ -60,7 +60,7 @@ function Player:update(dt)
                 self.dy = Lume.clamp(self.dy, -0.8, 0.8)
             end
         elseif col.name == 'trigger' and col.active then
-            col:trigger(nil)
+            col:trigger()
         end
     end
 

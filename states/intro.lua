@@ -2,10 +2,8 @@ local intro = {}
 
 function intro:init()
     self.text = {
-        'Stanley,',
-        'It\'s been so long,',
-        'Wake up...',
-        'Hello world, this is the last message',
+        'Welcome...',
+        'This is <cool name here>'
     }
 end
 
@@ -56,7 +54,7 @@ function intro:draw()
 
     Resolution.start()
 
-    lg.setFont(Fonts.monospace[20])
+    lg.setFont(Fonts.display[48])
     lg.setColor(Colors[5][1], Colors[5][2], Colors[5][3], self.transparency)
     lg.printf(self.text[math.min(self.count, #self.text)], 0, VIRT_HEIGHT / 2, VIRT_WIDTH, 'center')
 

@@ -1,6 +1,6 @@
 -- Global variables to be used everywhere
 
-DEBUG = true
+DEBUG = not true
 
 VIRT_WIDTH  = 800
 VIRT_HEIGHT = 600
@@ -24,8 +24,9 @@ Fonts = {
 
     bold        = makeFont 'assets/fonts/Roboto-Bold.ttf',
     monospace   = makeFont 'assets/fonts/RobotoMono-Regular.ttf',
+    display     = makeFont 'assets/fonts/Abaddon-Bold.ttf'
 }
-Fonts.default = Fonts.bold
+Fonts.default = Fonts.display
 
 Colors = {
     -- Grays
