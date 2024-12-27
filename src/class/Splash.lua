@@ -23,6 +23,7 @@ function Splash:show(message)
 
         -- Change the text
         self.t = tostring(message)
+        print(self.t)
 
         -- Tween back in
         Timer.tween(0.5, {
