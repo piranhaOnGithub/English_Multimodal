@@ -2,18 +2,18 @@
 
 Trigger = Class{}
 
-function Trigger:init(x, y, h, world, next)
+function Trigger:init(x, y, w, h, world)
 
     self.x = x * TILE_SIZE
     self.y = y * TILE_SIZE
+    self.w = w
     self.h = h
     self.name = 'trigger'
 
     self.func   = nil
-    self.next   = nil
     self.active = false
 
-    world:add(self, self.x, self.y, 1, self.h)
+    world:add(self, self.x, self.y, self.w, self.h)
 end
 
 function Trigger:trigger(func)
