@@ -49,8 +49,12 @@ function Player:update(dt)
     for i = 1, len do
         local col = cols[i].other
         if col.name == 'tile' then
-            if col.t <= 28 and col.x < self.x + self.w and col.x + TILE_SIZE > self.x then
-                self.dy = 0.1
+            if col.t <= 28 then
+                if col.x < self.x + self.w and col.x + TILE_SIZE > self.x then
+                    self.dy = 0.1
+                elseif col.y < self.y then
+                    self.dx = 0
+                end
             elseif col.t == 29 then
                 if lk.isDown('up') then
                     self.dy = -0.8

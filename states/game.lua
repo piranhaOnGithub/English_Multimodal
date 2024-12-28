@@ -331,6 +331,38 @@ function game:enter()
     self.ladderTimeStart = lt.getTime()
     self.currentSplash  = 0
     self.splashTime = 0
+
+    -- Parallax background
+    self.background_x = self.player.x - 200
+    self.background_y = self.player.y - 410
+    self.vertical_add = 0
+
+    self.loops = {
+        {
+            x1 = 0,
+            x2 = 400,
+            y1 = 0,
+            y2 = 300,
+            speed = 1,
+            img = Graphics['layer-3']
+        },
+        {
+            x1 = 0,
+            x2 = 400,
+            y1 = 0,
+            y2 = 300,
+            speed = 1.1,
+            img = Graphics['layer-2']
+        },
+        {
+            x1 = 0,
+            x2 = 400,
+            y1 = 0,
+            y2 = 300,
+            speed = 1.2,
+            img = Graphics['layer-1']
+        },
+    }
 end
 
 function game:resume()
@@ -349,6 +381,47 @@ function game:update(dt)
 
     self.camera:lookAt(self.player.x + self.player.w / 2, self.player.y - VIRT_HEIGHT / 20)
 
+    -- Parallax logic
+    self.background_x = self.background_x + self.player.dx + 0.15
+
+    for _, loop in ipairs(self.loops) do
+        -- Horizontal wrapping
+        local wrap_x = self.player.x + self.player.w / 2 + 200
+
+        if self.background_x * loop.speed + loop.x1 >= wrap_x then
+            loop.x1 = loop.x1 - 800
+        elseif self.background_x * loop.speed + loop.x1 < wrap_x - 800 then
+            loop.x1 = loop.x1 + 800
+        end
+
+        if self.background_x * loop.speed + loop.x2 >= wrap_x then
+            loop.x2 = loop.x2 - 800
+        elseif self.background_x * loop.speed + loop.x2 < wrap_x - 800 then
+            loop.x2 = loop.x2 + 800
+        end
+
+        -- Vertical wrapping
+        local wrap_y = self.player.y + self.player.h / 2 + 110
+
+        if self.background_y + loop.y1 >= wrap_y then
+            loop.y1 = loop.y1 - 600
+        elseif self.background_y + loop.y1 < wrap_y - 600 then
+            loop.y1 = loop.y1 + 600
+        end
+
+        if self.background_y + loop.y2 >= wrap_y then
+            loop.y2 = loop.y2 - 600
+        elseif self.background_y + loop.y2 < wrap_y - 600 then
+            loop.y2 = loop.y2 + 600
+        end
+    end
+
+    if self.triggers[20].active then
+        self.background_y = self.player.y - 400 + self.vertical_add
+        self.vertical_add = self.vertical_add + -self.player.dy + 0.25
+    else
+        self.vertical_add = 0
+    end
     LastKeyPress = {}
 end
 
@@ -383,6 +456,27 @@ function game:draw()
 
     -- Clear the canvas
     lg.clear(0, 0, 0, 0)
+
+    -- Draw background
+    lg.setColor(Colors[16])
+    lg.rectangle('fill', self.player.x + self.player.w / 2 - 200, self.player.y - 180, 400, 300)
+    if DEBUG then
+        lg.setColor(Colors[11])
+        lg.rectangle('line', self.player.x + self.player.w / 2 - 200, self.player.y - 180, 400, 300)
+    end
+
+    -- Parallax
+    for i = 1, 3 do
+        local loop = self.loops[i]
+
+
+        lg.setColor(1, 1, 1, (i + 1) / 5)
+
+        lg.draw(loop.img, self.background_x * loop.speed + loop.x1, self.background_y + loop.y1)
+        lg.draw(loop.img, self.background_x * loop.speed + loop.x1, self.background_y + loop.y2)
+        lg.draw(loop.img, self.background_x * loop.speed + loop.x2, self.background_y + loop.y1)
+        lg.draw(loop.img, self.background_x * loop.speed + loop.x2, self.background_y + loop.y2)
+    end
 
     lg.setColor(1, 1, 1, 1)
 

@@ -5,6 +5,9 @@ Audio = {
     ['click'] = la.newSource('assets/audio/click.ogg', 'static'),
 }
 Graphics = {
+    ['layer-1'] = lg.newImage('assets/graphics/layer-1.png'),
+    ['layer-2'] = lg.newImage('assets/graphics/layer-2.png'),
+    ['layer-3'] = lg.newImage('assets/graphics/layer-3.png'),
     ['tileset'] = lg.newImage('assets/graphics/tileset.png'),
     tile = {},
 }
