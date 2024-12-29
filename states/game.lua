@@ -55,12 +55,12 @@ local function ladderTimer(self)
 
     local text = {
         'As you climb, you',
-        'wonder what may lie',
-        'at the top',
+        'begin to wonder what',
+        'may lie at the top',
 
         'The world had told',
-        'you what awaits you',
-        'at the summit...',
+        'you what awaits your',
+        'arrival at the summit...',
 
         '',
         attributes[1],
@@ -161,7 +161,7 @@ function game:enter()
         [3]     = Trigger(11, -2, 1, TILE_SIZE * 3, self.world),
         [4]     = Trigger(26, -3, 1, TILE_SIZE * 3, self.world),
         [5]     = Trigger(40, 3, 1, TILE_SIZE * 3, self.world),
-        [6]     = Trigger(33.5, 3, TILE_SIZE * 14.5, 1, self.world),
+        [6]     = Trigger(33.5, 2.5, TILE_SIZE * 14.5, 1, self.world),
         [7]     = Trigger(36, -1, 1, TILE_SIZE * 3, self.world),
         [8]     = Trigger(23, -3, 1, TILE_SIZE * 3, self.world),
         [9]     = Trigger(32.5, -2, 1, TILE_SIZE * 3, self.world),
@@ -177,6 +177,21 @@ function game:enter()
         [18]    = Trigger(40.5, -1.5, 1, 1, self.world),
         [19]    = Trigger(40.5, -0.5, 1, 1, self.world),
         [20]    = Trigger(38, 3, TILE_SIZE * 5, 1, self.world),
+        [21]    = Trigger(40.5, -7, 1, 1, self.world),
+        [22]    = Trigger(36, -5, TILE_SIZE * 9, 1, self.world),
+        [23]    = Trigger(33, 5, 1, TILE_SIZE * 3, self.world),
+        [24]    = Trigger(48, 5, 1, TILE_SIZE * 3, self.world),
+        [25]    = Trigger(61, 4, 1, TILE_SIZE * 3, self.world),
+        [26]    = Trigger(77, 4, 1, TILE_SIZE * 3, self.world),
+        [27]    = Trigger(94.5, 1, 1, TILE_SIZE * 3, self.world),
+        [28]    = Trigger(96.5, 1, 1, TILE_SIZE * 6, self.world),
+        -- Ladder when no climb
+        [29]    = Trigger(48, 5, 1, TILE_SIZE * 3, self.world),
+        [30]    = Trigger(59, 7, 1, TILE_SIZE * 3, self.world),
+        -- Ladder to lemonade man
+        [31]    = Trigger(104, 4, 1, TILE_SIZE * 3, self.world),
+        -- Lemonade man
+        [32]    = Trigger(67, -2, 1, TILE_SIZE * 3, self.world),
     }
     -- Add trigger actions
     self.actions = {
@@ -213,9 +228,9 @@ function game:enter()
             self.triggers[7].active = true
         end,
         [7] = function()
-            -- Create platform (parkour)
-            -- removeTiles(self, 5)
+            -- Create platform and route to lemonade man
             summonTiles(self, 6)
+            summonTiles(self, 18)
             self.triggers[10].active = true
         end,
         [8] = function()
@@ -225,6 +240,7 @@ function game:enter()
             removeTiles(self, 5)
             removeTiles(self, 6)
             removeTiles(self, 7)
+            removeTiles(self, 18)
             summonTiles(self, 2)
             summonTiles(self, 9)
             summonTiles(self, 11)
@@ -246,10 +262,14 @@ function game:enter()
         end,
         [11] = function()
             -- Disable backtracking
+            removeTiles(self, 3)
+            removeTiles(self, 4)
             removeTiles(self, 5)
             removeTiles(self, 6)
             summonTiles(self, 10)
+            self.triggers[8].active = false
             self.triggers[12].active = true
+            self.triggers[32].active = true
         end,
         [12] = function()
             self.splash:show('NO TURNING BACK')
@@ -265,17 +285,20 @@ function game:enter()
             removeTiles(self, 9)
             summonTiles(self, 12)
             summonTiles(self, 13)
+            summonTiles(self, 16)
+            summonTiles(self, 17)
             self.splash:show('The world gave you a choice')
             self.triggers[9].active = false
             self.triggers[15].active = true
         end,
         [15] = function()
-            self.splash:show('Another sort of trial?')
+            self.splash:show('say something intelligent here, like:\ncontingency Buckinghamshire')
             self.triggers[16].active = true
         end,
         [16] = function()
-            self.splash:show('The LADDER OF "SUCCESS" awaits its next climber')
             self.triggers[17].active = true
+            self.triggers[29].active = true
+            self.splash:show('The LADDER OF "SUCCESS" awaits its next climber')
         end,
         [17] = function()
             self.triggers[18].active = true
@@ -290,9 +313,111 @@ function game:enter()
             self.triggers[18].active = true
         end,
         [20] = function()
+            removeTiles(self, 16)
+            removeTiles(self, 17)
+            summonTiles(self, 14)
+            summonTiles(self, 15)
             self.triggers[17].active = false
             self.triggers[18].active = false
-            self.splash:show('You feel rather silly, now don\'t you?\nClimbing that ladder for ' .. math.floor(lt.getTime() - self.ladderTimeStart) .. ' seconds!')
+            self.triggers[29].active = false
+            self.triggers[30].active = false
+            self.triggers[21].active = true
+            self.triggers[23].active = true
+            self.triggers[24].active = true
+            self.splash:show('')
+        end,
+        [21] = function()
+            self.splash:show('...nothing but broken dreams...')
+            self.triggers[22].active = true
+        end,
+        [22] = function()
+            self.splash:show('')
+        end,
+        [23] = function()
+            removeTiles(self, 13)
+        end,
+        [24] = function()
+            self.triggers[23].active = false
+            removeTiles(self, 13)
+            self.triggers[25].active = true
+            self.splash:show('You begin to think about all the time you wasted, trying to climb the ladder...')
+        end,
+        [25] = function()
+            local time = math.floor(lt.getTime() - self.ladderTimeStart)
+            local minutes = math.floor(time / 60)
+            local seconds = time - minutes * 60
+            if minutes > 1 then
+                -- Can't be saying "1 minutes" now can we...
+                self.humanTime = tostring(minutes .. ' minutes and ' .. seconds .. ' seconds')
+            elseif minutes > 0 then
+                -- Saying "0 minutes" is even worse...
+                self.humanTime = tostring(minutes .. ' minute and ' .. seconds .. ' seconds')
+            else
+                -- Just the seconds
+                self.humanTime = tostring(seconds .. ' seconds')
+            end
+            self.triggers[26].active = true
+            self.splash:show('You realize it must have been about ' .. self.humanTime .. '!')
+        end,
+        [26] = function()
+            self.triggers[27].active = true
+            self.triggers[28].active = true
+            self.splash:show('You resolve to NEVER climb another random ladder again...')
+        end,
+        [27] = function()
+            self.splash:show('...wow...')
+        end,
+        [28] = function()
+            removeTiles(self, 14)
+            self.triggers[31].active = true
+        end,
+        -- Ladder when no climb
+        [29] = function()
+            self.triggers[30].active = true
+            self.splash:show('Another opportunity too good to be true')
+        end,
+        [30] = function()
+            -- Create a new player because collisions are
+            -- broken and so is my mind
+            self.player = Player(self.player.x + TILE_SIZE * 8, TILE_SIZE - self.player.h, self.world)
+
+            self.background_x = self.background_x - TILE_SIZE * 4.6
+            self.background_y = self.background_y + TILE_SIZE * 1
+
+            self.stand_opacity = 1
+            removeTiles(self, 11)
+            removeTiles(self, 12)
+            removeTiles(self, 13)
+            removeTiles(self, 16)
+            removeTiles(self, 17)
+            summonTiles(self, 18)
+            summonTiles(self, 19)
+        end,
+        [31] = function()
+            -- Create a new player because collisions are
+            -- broken and so is my mind
+            self.player = Player(self.player.x - TILE_SIZE * 37, TILE_SIZE - self.player.h, self.world)
+
+            self.background_x = self.background_x + TILE_SIZE * 2.5
+            self.background_y = self.background_y - TILE_SIZE * 6
+
+            self.stand_opacity = 1
+            removeTiles(self, 11)
+            removeTiles(self, 12)
+            removeTiles(self, 13)
+            removeTiles(self, 14)
+            removeTiles(self, 15)
+            summonTiles(self, 18)
+            summonTiles(self, 19)
+        end,
+        -- Lemonade man
+        [32] = function()
+            self.stand_opacity = 1
+            self.triggers[12].active = false
+            removeTiles(self, 7)
+            removeTiles(self, 8)
+            removeTiles(self, 10)
+            summonTiles(self, 19)
         end,
     }
 
@@ -306,7 +431,7 @@ function game:enter()
 
     -- DEBUG: activate all triggers up to a certain point
     if DEBUG then
-        for i = 1, 14 do
+        for i = 1, 7 do
             self.triggers[i]:trigger()
         end
     end
@@ -314,8 +439,10 @@ function game:enter()
     -- Player
     self.player = Player(TILE_SIZE * -8, TILE_SIZE, self.world)
     if DEBUG then
-        self.player = Player(TILE_SIZE * 15, -5, self.world)
+        self.player = Player(TILE_SIZE * 50, -1, self.world)
     end
+
+    self.lemon = Lemon(-5, 1, self.world)
 
     lg.setBackgroundColor(Colors[16])
 
@@ -329,14 +456,14 @@ function game:enter()
 
     -- Needed for ladder timer
     self.ladderTimeStart = lt.getTime()
-    self.currentSplash  = 0
+    self.currentSplash = 0
     self.splashTime = 0
+    self.humanTime = ''
 
     -- Parallax background
     self.background_x = self.player.x - 200
     self.background_y = self.player.y - 410
     self.vertical_add = 0
-
     self.loops = {
         {
             x1 = 0,
@@ -363,6 +490,10 @@ function game:enter()
             img = Graphics['layer-1']
         },
     }
+
+    -- LEMONS!!!
+    self.stand_opacity = 0
+
 end
 
 function game:resume()
@@ -380,6 +511,16 @@ function game:update(dt)
     Timer.update(dt)
 
     self.camera:lookAt(self.player.x + self.player.w / 2, self.player.y - VIRT_HEIGHT / 20)
+
+    -- Lemons
+    local items, len = self.world:getItems()
+
+    for i = 1, len do
+        local item = items[i]
+        if item.name == 'lemon' then
+            item:update(dt)
+        end
+    end
 
     -- Parallax logic
     self.background_x = self.background_x + self.player.dx + 0.15
@@ -486,9 +627,15 @@ function game:draw()
         local item = items[i]
         if item.name == 'tile' and item.x + TILE_SIZE >= self.player.x - VIRT_WIDTH / 2 and item.x <= self.player.x + self.player.w + VIRT_WIDTH / 2 then
             item:render(item)
+        elseif item.name == 'lemon' then
+            item:render()
         end
     end
 
+    lg.setColor(1, 1, 1, self.stand_opacity)
+    lg.draw(Graphics['stand'], TILE_SIZE * 56, -40)
+
+    lg.setColor(1, 1, 1, 1)
     self.player:render()
 
     if DEBUG then

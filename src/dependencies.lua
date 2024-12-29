@@ -19,10 +19,11 @@ require 'src.globals'
 
 -- [[ Classes ]]
 require 'src.class.Button'
-require 'src.class.Trigger'
+require 'src.class.Lemon'
 require 'src.class.Player'
-require 'src.class.Tile'
 require 'src.class.Splash'
+require 'src.class.Trigger'
+require 'src.class.Tile'
 
 -- [[ States ]]
 States = {

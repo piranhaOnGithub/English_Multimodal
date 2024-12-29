@@ -12,11 +12,19 @@ function Player:init(x, y, world)
     self.speed  = 90
     self.name   = 'player'
     self.world  = world
+    self.phase  = false
 
     self.world:add(self, self.x, self.y, self.w, self.h)
 end
 
 function Player:update(dt)
+
+    if DEBUG then
+        self.speed = 280
+    else
+        self.speed = 90
+    end
+
     self.dx = Lume.clamp(self.dx, -1, 1)
 
     if lk.isDown('left') and not lk.isDown('right') then
@@ -37,18 +45,21 @@ function Player:update(dt)
         self.x + self.dx * self.speed * dt,
         self.y + self.dy * self.speed * dt,
         function(self, other)
-            if other.name == 'tile' then
+            if self.phase then return nil
+            elseif other.name == 'tile' then
                 if other.t <= 28 then return 'slide' end
                 if other.t == 29 then return 'cross' end
                 if other.t >= 30 then return 'slide' end
-            end
-            if other.name == 'trigger' then return 'cross' end
+            elseif other.name == 'trigger' then return 'cross'
+            elseif other.name == 'lemon' then return 'cross' end
         end
     )
 
     for i = 1, len do
         local col = cols[i].other
-        if col.name == 'tile' then
+        if self.phase then
+            -- Don't do anything
+        elseif col.name == 'tile' then
             if col.t <= 28 then
                 if col.x < self.x + self.w and col.x + TILE_SIZE > self.x then
                     self.dy = 0.1
@@ -62,9 +73,16 @@ function Player:update(dt)
                     self.x = Lume.lerp(self.x, -self.w / 2 + col.x + TILE_SIZE / 2, 0.03)
                 end
                 self.dy = Lume.clamp(self.dy, -0.8, 0.8)
+            elseif col.t == 30 or col.t == 31 then
+                if col.y < self.y then
+                    self.dx = 0
+                end
             end
         elseif col.name == 'trigger' and col.active then
             col:trigger()
+        elseif col.name == 'lemon' and not col.acquired then
+            col:pickup()
+            print('LEMON acquired. You now have ' .. math.random(10, 10000) .. ' LEMONs')
         end
     end
 
