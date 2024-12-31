@@ -2,7 +2,7 @@
 
 Player = Class{}
 
-function Player:init(x, y, world)
+function Player:init(x, y, world, splash)
     self.x      = x
     self.y      = y
     self.w      = 10
@@ -12,7 +12,9 @@ function Player:init(x, y, world)
     self.speed  = 90
     self.name   = 'player'
     self.world  = world
+    self.splash = splash
     self.phase  = false
+    self.lemons = 0
 
     self.world:add(self, self.x, self.y, self.w, self.h)
 end
@@ -82,7 +84,9 @@ function Player:update(dt)
             col:trigger()
         elseif col.name == 'lemon' and not col.acquired then
             col:pickup()
-            print('LEMON acquired. You now have ' .. math.random(10, 10000) .. ' LEMONs')
+            self.lemons = self.lemons + 1
+            self.splash:displayLemons(self, false)
+            print('LEMON acquired. You now have ' .. tostring(self.lemons) .. ' LEMONs')
         end
     end
 

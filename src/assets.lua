@@ -5,10 +5,13 @@ Audio = {
     ['click'] = la.newSource('assets/audio/click.ogg', 'static'),
 }
 Graphics = {
+    ['anvil']   = lg.newImage('assets/graphics/you-failed.png'),
     ['layer-1'] = lg.newImage('assets/graphics/layer-1.png'),
     ['layer-2'] = lg.newImage('assets/graphics/layer-2.png'),
     ['layer-3'] = lg.newImage('assets/graphics/layer-3.png'),
     ['lemon']   = lg.newImage('assets/graphics/definitely-a-lemon.png'),
+    ['lime']    = lg.newImage('assets/graphics/definitely-a-lime.png'),
+    ['sign']    = lg.newImage('assets/graphics/too-many-lemons.png'),
     ['stand']   = lg.newImage('assets/graphics/limeade-stand.png'),
     ['tileset'] = lg.newImage('assets/graphics/tileset.png'),
     tile = {},

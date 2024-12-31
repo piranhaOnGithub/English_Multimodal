@@ -6,12 +6,16 @@ function Splash:init()
     self.t = ''
     self.text_h     = 100
     self.text_y     = 0
+    self.lemon_t = ''
+    self.lemon_x = TILE_SIZE
+    self.lemon_y = VIRT_HEIGHT
     self.opacity    = 1
     self.offset_x   = 0
     self.offset_y   = 0
+    self.font       = Fonts.display
 end
 
-function Splash:show(message)
+function Splash:show(message, alt_text)
     -- Transition between texts
 
     -- Tween out
@@ -22,6 +26,11 @@ function Splash:show(message)
     Timer.after(0.6, function()
 
         -- Change the text
+        if alt_text == true then
+            self.font = Fonts.light
+        else
+            self.font = Fonts.display
+        end
         self.t = tostring(message)
         print(self.t)
 
@@ -32,6 +41,34 @@ function Splash:show(message)
     end)
 end
 
+function Splash:displayLemons(player, limes)
+    if limes then
+        self.lemon_t = 'YOU HAVE ' .. player.lemons .. ' LIME'
+        if player.lemons > 1 then
+            self.lemon_t = self.lemon_t .. 'S'
+        end
+    else
+        self.lemon_t = 'YOU HAVE ' .. player.lemons .. ' LEMON'
+        if player.lemons > 1 then
+            self.lemon_t = self.lemon_t .. 'S'
+        end
+    end
+
+    Timer.tween(2, {
+        [self] = {
+            lemon_y = VIRT_HEIGHT - TILE_SIZE
+        }
+    }) : ease(Easing.outElastic)
+end
+
+function Splash:hideLemons()
+    Timer.tween(0.5, {
+        [self] = {
+            lemon_y = VIRT_HEIGHT
+        }
+    }) : ease(Easing.inSine)
+end
+
 function Splash:update(dt)
     -- Fancy text logic here
     self.offset_x = math.cos(lt.getTime() * 2) * 5
@@ -39,37 +76,17 @@ function Splash:update(dt)
 end
 
 function Splash:render()
-    lg.setFont(Fonts.display[24])
+    -- Splash
+    lg.setFont(self.font[24])
     lg.setColor(Colors[4][1], Colors[4][2], Colors[4][3], self.opacity)
     lg.printf(self.t, -2 + self.offset_x, math.floor(self.text_y + self.text_h / 2) + 2 + self.offset_y, VIRT_WIDTH - 2 + self.offset_x, 'center')
     lg.setColor(Colors[5][1], Colors[5][2], Colors[5][3], self.opacity)
     lg.printf(self.t, self.offset_x, math.floor(self.text_y + self.text_h / 2) + self.offset_y, VIRT_WIDTH + self.offset_x, 'center')
+
+    -- Lemons
+    lg.setFont(Fonts.display[20])
+    lg.setColor(Colors[4])
+    lg.printf(self.lemon_t, self.lemon_x - 2, self.lemon_y + 2, VIRT_WIDTH, 'left')
+    lg.setColor(Colors[5])
+    lg.printf(self.lemon_t, self.lemon_x, self.lemon_y, VIRT_WIDTH, 'left')
 end
-
---[[
-
-        -- Tween in
-        Timer.tween(0.5, {
-            [self] = {text_y = 0}
-        }) : ease(Easing.outExpo)
-
-        -- Run function (if passed)
-        local script = func
-        if func == nil then
-            script = self.func
-        end
-
-        local status, err = pcall(script)
-        if not status then
-            print(err)
-        end
-
-        -- Wait
-        Timer.after(5, function()
-            -- Tween out
-            Timer.tween(0.5, {
-                [self] = {text_y = -self.text_h}
-            }) : ease(Easing.inExpo)
-        end)
-
-]]
