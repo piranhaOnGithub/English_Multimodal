@@ -15,6 +15,7 @@ function Player:init(x, y, world, splash)
     self.splash = splash
     self.phase  = false
     self.lemons = 0
+    self.limes  = 0
 
     self.world:add(self, self.x, self.y, self.w, self.h)
 end
@@ -76,17 +77,22 @@ function Player:update(dt)
                 end
                 self.dy = Lume.clamp(self.dy, -0.8, 0.8)
             elseif col.t == 30 or col.t == 31 then
-                if col.y < self.y then
-                    self.dx = 0
-                end
+                self.dx = 0
             end
         elseif col.name == 'trigger' and col.active then
             col:trigger()
         elseif col.name == 'lemon' and not col.acquired then
-            col:pickup()
-            self.lemons = self.lemons + 1
-            self.splash:displayLemons(self, false)
-            print('LEMON acquired. You now have ' .. tostring(self.lemons) .. ' LEMONs')
+            if not col.is_lime then
+                col:pickup()
+                self.lemons = self.lemons + 1
+                self.splash:displayLemons(self, false)
+                print('LEMON acquired. You now have ' .. tostring(self.lemons) .. ' LEMONs')
+            else
+                col:pickup()
+                self.limes = self.limes + 1
+                self.splash:displayLemons(self, true)
+                print('LIME acquired. You now have ' .. tostring(self.limes) .. ' LIMEs')
+            end
         end
     end
 

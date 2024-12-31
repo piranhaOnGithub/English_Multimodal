@@ -20,6 +20,7 @@ require 'src.globals'
 -- [[ Classes ]]
 require 'src.class.Button'
 require 'src.class.Lemon'
+require 'src.class.LemonadeMan'
 require 'src.class.Player'
 require 'src.class.Splash'
 require 'src.class.Trigger'

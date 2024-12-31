@@ -51,16 +51,23 @@ local rhetoric = {
 
 local lemon_dialogue = {
     'Well, what have we here?',
-    'A traveller seeking wisdom?',
+    'A traveller seeking wisdom, perhaps?',
     'I\'m afraid this world may be the wrong place to find it...',
     '. . .',
     'Fetch me three lemons and I\'ll help you find what you seek',
     'You know, kid, when life gives you lemons...\nyou make lemonade',
-    'But that doesn\'t mean you should go out\nand grab as many lemons as you possibly can!',
+    'But going out and grabbing those lemons\ndoesn\'t make life any sweeter',
     'There\'s a lesson in that, kid',
     '- Lemonade Stand Man',
-    '(P.S.) also... I dropped my anvil somewhere...',
+    '(P.S.) also... I accidentally dropped my\nwand and summoned an anvil...',
     'Let me know if you find it, okay?',
+    '',
+    'Ah! Thank you very much!',
+    '. . .',
+    'Erm... these are limes',
+    'How did you think these were lemons?\nThey\'re literally green!',
+    '. . .',
+    'Well, it may not be the answer you\'re looking for,\nbut an artifact lies to the right that may help you...',
     ''
 }
 
@@ -219,6 +226,10 @@ function game:enter()
         [36]    = Trigger(55, -3, 1, TILE_SIZE * 3, self.world),
         [37]    = Trigger(55, -3, 1, TILE_SIZE * 3, self.world),
         [38]    = Trigger(55, -3, 1, TILE_SIZE * 3, self.world),
+        -- Lemonade man to ladder
+        [39]    = Trigger(37, 7, 1, TILE_SIZE * 3, self.world),
+        [40]    = Trigger(20, 3, 1, TILE_SIZE * 3, self.world),
+
     }
     -- Add trigger actions
     self.actions = {
@@ -314,6 +325,7 @@ function game:enter()
             summonTiles(self, 13)
             summonTiles(self, 16)
             summonTiles(self, 17)
+            summonTiles(self, 27)
             self.splash:show('The world gave you a choice')
             self.triggers[9].active = false
             self.triggers[15].active = true
@@ -371,7 +383,7 @@ function game:enter()
             self.triggers[23].active = false
             removeTiles(self, 13)
             self.triggers[25].active = true
-            self.splash:show('You begin to think about all the time you wasted, trying to climb the ladder...')
+            self.splash:show('You begin to think about all the time you wasted,\ntrying to climb that cursed ladder...')
         end,
         [25] = function()
             local time = math.floor(lt.getTime() - self.ladderTimeStart)
@@ -425,6 +437,7 @@ function game:enter()
             removeTiles(self, 13)
             removeTiles(self, 16)
             removeTiles(self, 17)
+            removeTiles(self, 27)
             summonTiles(self, 18)
             summonTiles(self, 19)
             self.triggers[33].active = true
@@ -444,6 +457,7 @@ function game:enter()
             removeTiles(self, 13)
             removeTiles(self, 14)
             removeTiles(self, 15)
+            removeTiles(self, 27)
             summonTiles(self, 18)
             summonTiles(self, 19)
             self.triggers[33].active = true
@@ -493,12 +507,12 @@ function game:enter()
             self.currentSplash = 1
             self.camera.smoother = Camera.smooth.damped(2)
 
-            Timer.every(1, function()
+            Timer.every(4, function()
                 self.currentSplash = self.currentSplash + 1
                 self.splash:show(lemon_dialogue[self.currentSplash], true)
             end) : limit(4)
 
-            Timer.after(--[[(#lemon_dialogue - 1) * 5 + 1]]1, function()
+            Timer.after(20, function()
                 self.lemon_camera = false
                 self.camera.smoother = Camera.smooth.damped(15)
                 removeTiles(self, 20)
@@ -511,6 +525,11 @@ function game:enter()
             summonTiles(self, 23)
             summonTiles(self, 24)
             self.splash:show(lemon_dialogue[1], true)
+            Timer.tween(2, {
+                [self.lemonadeMan] = {
+                    opacity = 1
+                }
+            }) : ease(Easing.inOutSine)
         end,
         [34] = function()
             self.triggers[35].active = true
@@ -523,15 +542,63 @@ function game:enter()
             else
                 self.stand_opacity = 0
                 self.sign_opacity = 1
+                self.lemonadeMan.opacity = 0
                 self.triggers[38].active = true
             end
         end,
         [36] = function()
             -- Correct amount of lemons
+            Lemon(65, 0, self.world, true)
             self.lemon_camera = true
+            self.camera.smoother = Camera.smooth.damped(2)
+            self.currentSplash = 13
             summonTiles(self, 20)
             summonTiles(self, 21)
-            self.splash:show('Hooray!', true)
+            self.splash:show(lemon_dialogue[self.currentSplash], true)
+            self.splash:hideLemons()
+
+            Timer.every(4, function()
+                self.currentSplash = self.currentSplash + 1
+                self.splash:show(lemon_dialogue[self.currentSplash], true)
+                if self.currentSplash == 16 then
+                    self.temporary_lemon = Lemon(57, -3, self.world)
+                    self.temporary_lemon.opacity = 0
+                    Timer.tween(1.5, {
+                        [self.lemonadeMan] = {
+                            arm_up = 2.35
+                        }
+                    }) : ease(Easing.inOutQuint)
+                    Timer.after(0.75, function()
+                        Timer.tween(0.5, {
+                            [self.temporary_lemon] = {
+                                opacity = 1,
+                                x = self.temporary_lemon.x + 5
+                            }
+                        }) : ease(Easing.inOutQuad)
+                    end)
+                elseif self.currentSplash == 17 then
+                    Timer.tween(0.75, {
+                        [self.lemonadeMan] = {
+                            arm_up = 1
+                        }
+                    }) : ease(Easing.inOutQuint)
+                    : finish(function()
+                        Timer.tween(1.5, {
+                            [self.lemonadeMan] = {
+                                arm_up = 1.45
+                            }
+                        }) : ease(Easing.inOutQuint)
+                    end)
+                    self.temporary_lemon:pickup()
+                    self.splash:hideLemons()
+                end
+            end) : limit(6)
+            : finish(function()
+                self.lemon_camera = false
+                self.camera.smoother = Camera.smooth.damped(15)
+                removeTiles(self, 20)
+                removeTiles(self, 21)
+            end)
         end,
         [37] = function()
             -- Not enough lemons
@@ -541,16 +608,41 @@ function game:enter()
             summonTiles(self, 21)
             self.splash:show('Really? You couldn\'t handle collecting three measly lemons?', true)
             Timer.after(3, function()
+                Timer.tween(1.5, {
+                    [self.lemonadeMan] = {
+                        arm_up = math.pi * 6 + 1.45
+                    }
+                }) : ease(Easing.inOutQuint)
                 Timer.tween(2, {
                     [self] = {
                         anvil_opacity = 1
                     }
                 }) : ease(Easing.inOutQuad)
                 : finish(function()
+                    Timer.tween(1.25, {
+                        [self.lemonadeMan] = {
+                            arm_up = math.pi * 6 + 2.35
+                        }
+                    }) : ease(Easing.inOutQuint)
+                    Timer.tween(1.75, {
+                        [self] = {
+                            anvil_x = self.player.x - 10,
+                            anvil_y = -120
+                        }
+                    }) : ease(Easing.inOutQuad)
+                    : finish(function()
+                        Timer.tween(0.4, {
+                            [self.lemonadeMan] = {
+                                arm_up = math.pi * 6 + 1
+                            }
+                        }) : ease(Easing.inOutQuint)
+                    end)
                     self.splash:show('...prepare to be crushed', true)
+
                     Timer.after(2, function()
                         Timer.tween(0.15, {
                             [self] = {
+                                anvil_x = self.player.x - 10,
                                 anvil_y = self.player.y + self.player.h - 16
                             }
                         }) : ease(Easing.inCubic)
@@ -563,8 +655,9 @@ function game:enter()
                             : finish(function()
                                 self.lemon_camera = false
                                 self.anvil_opacity = 0
+                                self.stand_opacity = 0
                                 self.currentSplash = 0
-                                self.player = Player(17 * TILE_SIZE, 5 * TILE_SIZE, self.world, self.splash)
+                                self.player = Player(39 * TILE_SIZE, 8 * TILE_SIZE, self.world, self.splash)
                                 self.camera.smoother = Camera.smooth.damped(15)
 
                                 local items, len = self.world:getItems()
@@ -583,10 +676,10 @@ function game:enter()
                                 removeTiles(self, 22)
                                 removeTiles(self, 23)
                                 removeTiles(self, 24)
-                                summonTiles(self, 12)
-                                summonTiles(self, 13)
                                 summonTiles(self, 25)
-                                self.triggers[15].active = true
+                                summonTiles(self, 26)
+                                summonTiles(self, 27)
+                                self.triggers[39].active = true
                                 self.splash:show('')
                                 self.splash:hideLemons()
                                 Timer.after(1, function()
@@ -605,19 +698,22 @@ function game:enter()
         [38] = function()
             -- Too many lemons
             self.lemon_camera = true
+            self.camera.smoother = Camera.smooth.damped(2)
             summonTiles(self, 20)
             summonTiles(self, 21)
-            self.splash:show('There\'s a sign here. You can barely decipher the writing:')
+            self.splash:show('There\'s a sign here. You can just barely decipher the writing:')
 
             Timer.every(5, function()
                 self.currentSplash = self.currentSplash + 1
                 self.splash:show(lemon_dialogue[self.currentSplash], true)
             end) : limit(7)
             : finish(function()
+                self.anvil_x = self.player.x
                 self.anvil_y = -200
                 self.anvil_opacity = 1
                 Timer.tween(0.3, {
                     [self] = {
+                        anvil_x = self.player.x,
                         anvil_y = self.player.y + self.player.h - 16
                     }
                 }) : ease(Easing.inCubic)
@@ -630,8 +726,9 @@ function game:enter()
                     : finish(function()
                         self.lemon_camera = false
                         self.anvil_opacity = 0
+                        self.stand_opacity = 0
                         self.currentSplash = 0
-                        self.player = Player(17 * TILE_SIZE, 5 * TILE_SIZE, self.world, self.splash)
+                        self.player = Player(39 * TILE_SIZE, 8 * TILE_SIZE, self.world, self.splash)
                         self.camera.smoother = Camera.smooth.damped(15)
 
                         local items, len = self.world:getItems()
@@ -650,10 +747,10 @@ function game:enter()
                         removeTiles(self, 22)
                         removeTiles(self, 23)
                         removeTiles(self, 24)
-                        summonTiles(self, 12)
-                        summonTiles(self, 13)
                         summonTiles(self, 25)
-                        self.triggers[15].active = true
+                        summonTiles(self, 26)
+                        summonTiles(self, 27)
+                        self.triggers[39].active = true
                         self.splash:show('')
                         self.splash:hideLemons()
                         Timer.after(1, function()
@@ -666,6 +763,19 @@ function game:enter()
                     end)
                 end)
             end)
+        end,
+        -- Lemonade to ladder
+        [39] = function()
+            self.triggers[40].active = true
+            self.splash:show('Your failure; a throbbing pain gnawing at your skull')
+        end,
+        [40] = function()
+            removeTiles(self, 26)
+            summonTiles(self, 12)
+            summonTiles(self, 13)
+            summonTiles(self, 16)
+            self.triggers[16].active = true
+            self.splash:show('Knowing this world the way you did, it wouldn\'t\nbe long before it threw something else your way')
         end,
     }
 
@@ -689,6 +799,8 @@ function game:enter()
     if DEBUG then
         self.player = Player(TILE_SIZE * 48, TILE_SIZE * -5, self.world, self.splash)
     end
+
+    self.lemonadeMan = LemonadeMan(58 * TILE_SIZE, -0.5 * TILE_SIZE, self.player)
 
     lg.setBackgroundColor(Colors[16])
 
@@ -742,6 +854,7 @@ function game:enter()
     self.stand_opacity = 0
     self.sign_opacity = 0
     self.anvil_opacity = 0
+    self.anvil_x = self.lemonadeMan.x
     self.anvil_y = -100
     self.lemon_camera = false
     self.has_lemoned = false
@@ -831,9 +944,8 @@ end
 
 function game:keypressed(key, code)
     if key == 'kp1' then
-        self.splash:hideLemons()
     elseif key == 'kp2' then
-        self.triggers[6]:trigger()
+        Lume.hotswap("src.class.LemonadeMan")
     end
     if DEBUG then
         self.camera:zoomTo(0.5)
@@ -906,10 +1018,11 @@ function game:draw()
     lg.draw(Graphics['sign'], TILE_SIZE * 56, -40)
 
     lg.setColor(1, 1, 1, 1)
+    self.lemonadeMan:render()
     self.player:render()
 
     lg.setColor(1, 1, 1, self.anvil_opacity)
-    lg.draw(Graphics['anvil'], self.player.x - 10, self.anvil_y)
+    lg.draw(Graphics['anvil'], self.anvil_x - 10, self.anvil_y)
 
     if DEBUG then
         lg.setColor(Colors[10])

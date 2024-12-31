@@ -2,7 +2,7 @@
 
 Lemon = Class{}
 
-function Lemon:init(x, y, world, splash)
+function Lemon:init(x, y, world, is_lime)
     self.x      = x * TILE_SIZE + TILE_SIZE / 4
     self.y      = y * TILE_SIZE + TILE_SIZE / 4
     self.name   = 'lemon'
@@ -11,8 +11,10 @@ function Lemon:init(x, y, world, splash)
     self.scale    = 1
     self.offset_x = 0
     self.offset_y = 0
+    self.opacity  = 1
     self.unsync   = (x + y) * 0.5
     self.acquired = false
+    self.is_lime = is_lime
 
     self.world:add(self, self.x, self.y, TILE_SIZE / 2, TILE_SIZE / 2)
 end
@@ -32,8 +34,7 @@ function Lemon:pickup()
     end)
 end
 
-function Lemon:update(dt)
-    -- self.rotation = math.pi + math.cos(lt.getTime() * dt)
+function Lemon:update()
     self.offset_x = math.cos((self.unsync + lt.getTime()) * 3) * 3
     self.offset_y = math.sin((self.unsync + lt.getTime()) * 3) * 3
 end
@@ -44,7 +45,12 @@ function Lemon:render()
         lg.push()
             lg.translate(self.x - 5, self.y - 5)
             lg.rotate(self.rotation)
-            lg.draw(Graphics['lemon'], self.offset_x, self.offset_y, 0, self.scale, self.scale)
+            lg.setColor(1, 1, 1, self.opacity)
+            if not self.is_lime then
+                lg.draw(Graphics['lemon'], self.offset_x, self.offset_y, 0, self.scale, self.scale)
+            else
+                lg.draw(Graphics['lime'], self.offset_x, self.offset_y, 0, self.scale, self.scale)
+            end
         lg.pop()
     else
         lg.setColor(Colors[14])

@@ -43,8 +43,8 @@ end
 
 function Splash:displayLemons(player, limes)
     if limes then
-        self.lemon_t = 'YOU HAVE ' .. player.lemons .. ' LIME'
-        if player.lemons > 1 then
+        self.lemon_t = 'YOU HAVE ' .. player.limes .. ' LIME'
+        if player.limes > 1 then
             self.lemon_t = self.lemon_t .. 'S'
         end
     else
