@@ -1,6 +1,6 @@
 -- Global variables to be used everywhere
 
-DEBUG = not not true
+DEBUG = not not not not true
 
 VIRT_WIDTH  = 800
 VIRT_HEIGHT = 600
