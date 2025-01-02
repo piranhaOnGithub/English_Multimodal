@@ -7,7 +7,6 @@ function Splash:init()
     self.text_h     = 100
     self.text_y     = 0
     self.lemon_t = ''
-    self.lemon_x = TILE_SIZE
     self.lemon_y = VIRT_HEIGHT
     self.opacity    = 1
     self.offset_x   = 0
@@ -47,6 +46,13 @@ function Splash:displayLemons(player, limes)
         if player.limes > 1 then
             self.lemon_t = self.lemon_t .. 'S'
         end
+        Timer.after(5, function()
+            Timer.tween(0.5, {
+                [self] = {
+                    lemon_y = VIRT_HEIGHT
+                }
+            }) : ease(Easing.inSine)
+        end)
     else
         self.lemon_t = 'YOU HAVE ' .. player.lemons .. ' LEMON'
         if player.lemons > 1 then
@@ -56,7 +62,7 @@ function Splash:displayLemons(player, limes)
 
     Timer.tween(2, {
         [self] = {
-            lemon_y = VIRT_HEIGHT - TILE_SIZE
+            lemon_y = VIRT_HEIGHT - 60
         }
     }) : ease(Easing.outElastic)
 end
@@ -86,7 +92,7 @@ function Splash:render()
     -- Lemons
     lg.setFont(Fonts.display[20])
     lg.setColor(Colors[4])
-    lg.printf(self.lemon_t, self.lemon_x - 2, self.lemon_y + 2, VIRT_WIDTH, 'left')
+    lg.printf(self.lemon_t, -2, self.lemon_y + 2, VIRT_WIDTH - 2, 'center')
     lg.setColor(Colors[5])
-    lg.printf(self.lemon_t, self.lemon_x, self.lemon_y, VIRT_WIDTH, 'left')
+    lg.printf(self.lemon_t, 0, self.lemon_y, VIRT_WIDTH, 'center')
 end

@@ -2,8 +2,7 @@ local intro = {}
 
 function intro:init()
     self.text = {
-        'Welcome...',
-        'This is <cool name here>'
+        'Welcome back, traveller...'
     }
 end
 
@@ -15,7 +14,7 @@ function intro:enter()
 
     lg.setBackgroundColor(Colors[4])
 
-    Timer.every(2, function()
+    Timer.every(2.5, function()
         Timer.tween(1, {
             [self] = {
                 transparency = self.destination
