@@ -257,7 +257,9 @@ function game:enter()
         [56]    = Trigger(80, 40, TILE_SIZE, 1, self.world),
         [57]    = Trigger(79.5, 28, 1, TILE_SIZE * 3, self.world),
         [58]    = Trigger(65, 31.5, TILE_SIZE * 14, 1, self.world),
+        -- Misc.
         [59]    = Trigger(80.5, -11, 1, TILE_SIZE * 3, self.world),
+        [60]    = Trigger(1, 0, 1, TILE_SIZE * 3, self.world),
     }
     -- Add trigger actions
     self.actions = {
@@ -265,13 +267,9 @@ function game:enter()
         [1] = function()
             self.splash:show('You have been here for as long as you can remember')
             self.triggers[2].active = true
+            self.triggers[60].active = true
         end,
         [2] = function()
-            Timer.tween(1, {
-                [self] = {
-                    tutorial_opacity = 0
-                }
-            }) : ease(Easing.inOutQuart)
             self.splash:show('This world...')
             self.triggers[3].active = true
         end,
@@ -946,7 +944,7 @@ function game:enter()
         end,
         [48] = function()
             self.triggers[53].active = true
-            self.splash:show('Another trap?')
+            self.splash:show('You questioned the world\'s insistence on tricking you')
         end,
         -- Lemonade success to end
         [49] = function()
@@ -975,7 +973,7 @@ function game:enter()
             end)
             self.triggers[54].active = true
             self.triggers[55].active = true
-            self.splash:show('...and the world was silent...')
+            self.splash:show('...but the world was silent...')
         end,
         [54] = function()
             summonTiles(self, 38)
@@ -1054,6 +1052,13 @@ function game:enter()
             removeTiles(self, 28)
             summonTiles(self, 41)
         end,
+        [60] = function()
+            Timer.tween(1, {
+                [self] = {
+                    tutorial_opacity = 0
+                }
+            }) : ease(Easing.inOutQuart)
+        end
     }
 
     -- Add actions to triggers
@@ -1106,7 +1111,7 @@ function game:enter()
     self.skippedLadder = false
 
     -- Parallax background
-    self.background_x = -440
+    self.background_x = 0
     self.background_y = -414
     self.vertical_add = 0
     self.loops = {
@@ -1115,7 +1120,7 @@ function game:enter()
             x2 = 400,
             y1 = 0,
             y2 = 300,
-            speed = 1,
+            speed = 11,
             img = Graphics['layer-3']
         },
         {
@@ -1123,7 +1128,7 @@ function game:enter()
             x2 = 400,
             y1 = 0,
             y2 = 300,
-            speed = 1.1,
+            speed = 9,
             img = Graphics['layer-2']
         },
         {
@@ -1131,7 +1136,7 @@ function game:enter()
             x2 = 400,
             y1 = 0,
             y2 = 300,
-            speed = 1.2,
+            speed = 12,
             img = Graphics['layer-1']
         },
     }
@@ -1187,53 +1192,52 @@ function game:update(dt)
     end
 
     -- Parallax logic
-    if not self.lemon_camera then
-        self.background_x = self.background_x + self.player.dx + 0.15
-    else
-        self.background_x = self.background_x + 0.15
-    end
-
     for _, loop in ipairs(self.loops) do
-        -- Horizontal wrapping
-        local wrap_x = self.player.x + self.player.w / 2 + 200
 
+        local counter = self.player.dx * -0.5
+
+
+        -- Don't accelerate the camera when it's stationary
         if self.lemon_camera then
-            wrap_x = 200 + TILE_SIZE * 56.5
+            counter = 0
+        else
+            loop.y1 = loop.y1 - self.player.dy + 0.25
+            loop.y2 = loop.y2 - self.player.dy + 0.25
         end
 
-        if self.background_x * loop.speed + loop.x1 >= wrap_x then
+        -- Move at different speeds
+        loop.x1 = loop.x1 + loop.speed * dt + counter
+        loop.x2 = loop.x2 + loop.speed * dt + counter
+
+        -- Horizontal wrapping
+        local origin_x = self.camera.x - VIRT_WIDTH / 4
+        local wrap_x = self.camera.x + VIRT_WIDTH / 4
+
+        if origin_x + loop.x1 >= wrap_x then
             loop.x1 = loop.x1 - 800
-        elseif self.background_x * loop.speed + loop.x1 < wrap_x - 800 then
+        elseif origin_x + loop.x1 < wrap_x - 800 then
             loop.x1 = loop.x1 + 800
         end
-
-        if self.background_x * loop.speed + loop.x2 >= wrap_x then
+        if origin_x + loop.x2 >= wrap_x then
             loop.x2 = loop.x2 - 800
-        elseif self.background_x * loop.speed + loop.x2 < wrap_x - 800 then
+        elseif origin_x + loop.x2 < wrap_x - 800 then
             loop.x2 = loop.x2 + 800
         end
 
         -- Vertical wrapping
-        local wrap_y = self.player.y + self.player.h / 2 + 110
+        local origin_y = self.camera.y - VIRT_HEIGHT / 4
+        local wrap_y = self.camera.y + VIRT_HEIGHT / 4
 
-        if self.background_y + loop.y1 >= wrap_y then
+        if origin_y + loop.y1 >= wrap_y then
             loop.y1 = loop.y1 - 600
-        elseif self.background_y + loop.y1 < wrap_y - 600 then
+        elseif origin_y + loop.y1 < wrap_y - 600 then
             loop.y1 = loop.y1 + 600
         end
-
-        if self.background_y + loop.y2 >= wrap_y then
+        if origin_y + loop.y2 >= wrap_y then
             loop.y2 = loop.y2 - 600
-        elseif self.background_y + loop.y2 < wrap_y - 600 then
+        elseif origin_y + loop.y2 < wrap_y - 600 then
             loop.y2 = loop.y2 + 600
         end
-    end
-
-    if self.triggers[20].active then
-        self.background_y = self.player.y - 400 + self.vertical_add
-        self.vertical_add = self.vertical_add + -self.player.dy + 0.25
-    else
-        self.vertical_add = 0
     end
 
     -- If somebody happens to break the game
@@ -1263,11 +1267,12 @@ end
 
 function game:keypressed(key, code)
     if key == 'kp1' then
+        print(Inspect(self.player.dx))
     elseif key == 'kp2' then
         Lume.hotswap("src.class.LemonadeMan")
     end
     if DEBUG then
-        self.camera:zoomTo(0.5)
+        self.camera:zoomTo(1)
     else
         self.camera:zoomTo(2)
     end
@@ -1294,12 +1299,7 @@ function game:draw()
 
     -- Draw background
     lg.setColor(Colors[16])
-
-    if not self.lemon_camera then
-        lg.rectangle('fill', self.player.x + self.player.w / 2 - 225, self.player.y - 305, 450, 450)
-    else
-        lg.rectangle('fill', TILE_SIZE * 56.5 - 250, TILE_SIZE * -1.5 - 230, 500, 400)
-    end
+    lg.rectangle('fill', self.camera.x - VIRT_WIDTH / 4, self.camera.y - VIRT_HEIGHT / 4, VIRT_WIDTH / 2, VIRT_HEIGHT / 2)
 
     if DEBUG then
         lg.setColor(Colors[11])
@@ -1309,12 +1309,14 @@ function game:draw()
     -- Parallax
     for i = 1, 3 do
         local loop = self.loops[i]
+        local origin_x = self.camera.x - VIRT_WIDTH / 4
+        local origin_y = self.camera.y - VIRT_HEIGHT / 4
 
         lg.setColor(1, 1, 1, (i + 1) / 5)
-        lg.draw(loop.img, self.background_x * loop.speed + loop.x1, self.background_y + loop.y1)
-        lg.draw(loop.img, self.background_x * loop.speed + loop.x1, self.background_y + loop.y2)
-        lg.draw(loop.img, self.background_x * loop.speed + loop.x2, self.background_y + loop.y1)
-        lg.draw(loop.img, self.background_x * loop.speed + loop.x2, self.background_y + loop.y2)
+        lg.draw(loop.img, origin_x + loop.x1, origin_y + loop.y1)
+        lg.draw(loop.img, origin_x + loop.x1, origin_y + loop.y2)
+        lg.draw(loop.img, origin_x + loop.x2, origin_y + loop.y1)
+        lg.draw(loop.img, origin_x + loop.x2, origin_y + loop.y2)
     end
 
     lg.setColor(1, 1, 1, 1)
@@ -1406,7 +1408,7 @@ function game:draw()
     -- Let the player know how to move
     if self.tutorial_opacity > 0 then
         lg.setColor(1, 1, 1, self.tutorial_opacity)
-        lg.draw(Graphics['arrows'], VIRT_WIDTH / 2 - 56, VIRT_HEIGHT / 2 - 32, 0, 2, 2)
+        lg.draw(Graphics['arrows'], VIRT_WIDTH / 2 - 56, VIRT_HEIGHT / 2.5, 0, 2, 2)
     end
 
     self.splash:render()
