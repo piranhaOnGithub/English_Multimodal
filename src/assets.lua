@@ -6,6 +6,7 @@ Audio = {
 }
 Graphics = {
     ['anvil']   = lg.newImage('assets/graphics/you-failed.png'),
+    ['arrows']  = lg.newImage('assets/graphics/arrows.png'),
     ['layer-1'] = lg.newImage('assets/graphics/layer-1.png'),
     ['layer-2'] = lg.newImage('assets/graphics/layer-2.png'),
     ['layer-3'] = lg.newImage('assets/graphics/layer-3.png'),

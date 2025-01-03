@@ -267,6 +267,11 @@ function game:enter()
             self.triggers[2].active = true
         end,
         [2] = function()
+            Timer.tween(1, {
+                [self] = {
+                    tutorial_opacity = 0
+                }
+            }) : ease(Easing.inOutQuart)
             self.splash:show('This world...')
             self.triggers[3].active = true
         end,
@@ -444,7 +449,7 @@ function game:enter()
         [26] = function()
             self.triggers[27].active = true
             self.triggers[28].active = true
-            self.splash:show('You resolve to stay away from random ladders')
+            self.splash:show('You resolve to stay away from random ladders from now on')
         end,
         [27] = function()
             self.splash:show('wow...')
@@ -1082,6 +1087,13 @@ function game:enter()
         Timer.tween(0.75, {
             [self] = {fade_in_opacity = 0}
         }) : ease(Easing.inOutSine)
+        : finish(function()
+            Timer.tween(1, {
+                [self] = {
+                    tutorial_opacity = 1
+                }
+            }) : ease(Easing.inOutQuart)
+        end)
     end)
 
     -- Needed for ladder
@@ -1138,7 +1150,8 @@ function game:enter()
     self.skippedParkour = false
     self.fade_out_x = 0
     self.cinematic_fade = 0
-
+    self.tutorial_opacity = 0
+    self.hacker_ending = false
 end
 
 function game:resume()
@@ -1222,6 +1235,29 @@ function game:update(dt)
     else
         self.vertical_add = 0
     end
+
+    -- If somebody happens to break the game
+    if not self.hacker_ending and self.player.y > TILE_SIZE * 100 then
+        self.hacker_ending = true
+        self.splash:show('WELL THAT WAS RATHER SILLY OF YOU!')
+        Timer.tween(2, {
+            [self] = {
+                fade_in_opacity = 0.5
+            }
+        }) : ease(Easing.inBounce)
+        : finish(function()
+            Timer.tween(1, {
+                [self] = {
+                    fade_in_opacity = 1
+                }
+            }) : ease(Easing.inBounce)
+            : finish(function()
+                self.splash:show('')
+                State.switch(States.intro)
+            end)
+        end)
+    end
+
     LastKeyPress = {}
 end
 
@@ -1366,6 +1402,12 @@ function game:draw()
 
     lg.setColor(1, 1, 1, 1)
     lg.draw(self.canvas, 0, 0)
+
+    -- Let the player know how to move
+    if self.tutorial_opacity > 0 then
+        lg.setColor(1, 1, 1, self.tutorial_opacity)
+        lg.draw(Graphics['arrows'], VIRT_WIDTH / 2 - 56, VIRT_HEIGHT / 2 - 32, 0, 2, 2)
+    end
 
     self.splash:render()
 

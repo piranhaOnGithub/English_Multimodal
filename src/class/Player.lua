@@ -30,13 +30,17 @@ function Player:update(dt)
 
     self.dx = Lume.clamp(self.dx, -1, 1)
 
-    if lk.isDown('left') and not lk.isDown('right') then
+    if lk.isDown('left') and not lk.isDown('right') and not lk.isDown('d')
+    or lk.isDown('a') and not lk.isDown('right') and not lk.isDown('d') then
         self.dx = self.dx - 0.3
-    elseif lk.isDown('right') and not lk.isDown('left') then
+    elseif lk.isDown('right') and not lk.isDown('left') and not lk.isDown('a')
+    or lk.isDown('d') and not lk.isDown('left') and not lk.isDown('a') then
         self.dx = self.dx + 0.3
     end
 
-    if LastKeyPress['up'] and self.dy == 0.25 then
+    if LastKeyPress['up'] and self.dy == 0.25
+    or LastKeyPress['w'] and self.dy == 0.25
+    or LastKeyPress['space'] and self.dy == 0.25 then
         self.dy = -3
     end
 
