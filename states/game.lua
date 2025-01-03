@@ -16,19 +16,25 @@ local function removeTiles(self, array)
 end
 
 local function summonTiles(self, array)
-    for i = 1, #self.map[array] do
-        local item = self.map[array][i]
-        if item.t > 0 and item.t <= 28 then -- normal
-            self.world:add(item, item.x, item.y, TILE_SIZE, TILE_SIZE)
-        elseif item.t == 29 then -- ladder
-            self.world:add(item, item.x + TILE_SIZE / 5, item.y, TILE_SIZE / 2.5, TILE_SIZE)
-        elseif item.t == 30 then -- fence left
-            self.world:add(item, item.x + TILE_SIZE / 5, item.y - TILE_SIZE, TILE_SIZE / 5, TILE_SIZE * 2)
-        elseif item.t == 31 then -- fence right
-            self.world:add(item, item.x + TILE_SIZE - TILE_SIZE / 2.5, item.y - TILE_SIZE, TILE_SIZE / 5, TILE_SIZE * 2)
+    local status, err = pcall(function()
+        for i = 1, #self.map[array] do
+            local item = self.map[array][i]
+            if item.t > 0 and item.t <= 28 then -- normal
+                self.world:add(item, item.x, item.y, TILE_SIZE, TILE_SIZE)
+            elseif item.t == 29 then -- ladder
+                self.world:add(item, item.x + TILE_SIZE / 5, item.y, TILE_SIZE / 2.5, TILE_SIZE)
+            elseif item.t == 30 then -- fence left
+                self.world:add(item, item.x + TILE_SIZE / 5, item.y - TILE_SIZE, TILE_SIZE / 5, TILE_SIZE * 2)
+            elseif item.t == 31 then -- fence right
+                self.world:add(item, item.x + TILE_SIZE - TILE_SIZE / 2.5, item.y - TILE_SIZE, TILE_SIZE / 5, TILE_SIZE * 2)
+            end
         end
+        print('----placed map section "' .. tostring(array) .. '"')
+    end)
+
+    if not status then
+        print('----tried to place map section "' .. tostring(array) .. '" but it already existed!')
     end
-    print('----placed map section "' .. tostring(array) .. '"')
 end
 
 local attributes = {
@@ -244,6 +250,14 @@ function game:enter()
         [50]    = Trigger(68, -10, 1, TILE_SIZE * 3, self.world),
         [51]    = Trigger(75, -11, 1, TILE_SIZE * 3, self.world),
         [52]    = Trigger(17, 4, 1, TILE_SIZE * 3, self.world),
+        -- End
+        [53]    = Trigger(80, 25, TILE_SIZE, 1, self.world),
+        [54]    = Trigger(73, 40, 1, TILE_SIZE * 3, self.world),
+        [55]    = Trigger(88, 40, 1, TILE_SIZE * 3, self.world),
+        [56]    = Trigger(80, 40, TILE_SIZE, 1, self.world),
+        [57]    = Trigger(79.5, 28, 1, TILE_SIZE * 3, self.world),
+        [58]    = Trigger(65, 31.5, TILE_SIZE * 14, 1, self.world),
+        [59]    = Trigger(80.5, -11, 1, TILE_SIZE * 3, self.world),
     }
     -- Add trigger actions
     self.actions = {
@@ -287,6 +301,7 @@ function game:enter()
         end,
         [8] = function()
             -- Disable backtracking
+            self.skippedParkour = true
             removeTiles(self, 3)
             removeTiles(self, 4)
             removeTiles(self, 5)
@@ -344,6 +359,7 @@ function game:enter()
             else
                 summonTiles(self, 31)
                 summonTiles(self, 35)
+                summonTiles(self, 37)
             end
             self.splash:show('The world gave you a choice')
             self.triggers[9].active = false
@@ -359,7 +375,7 @@ function game:enter()
             self.camera.smoother = Camera.smooth.damped(30)
             self.triggers[17].active = true
             self.triggers[29].active = true
-            self.splash:show('The LADDER OF "SUCCESS" awaits its next climber')
+            self.splash:show('The LADDER OF \'SUCCESS\' awaits its next climber')
         end,
         [17] = function()
             self.triggers[18].active = true
@@ -428,10 +444,10 @@ function game:enter()
         [26] = function()
             self.triggers[27].active = true
             self.triggers[28].active = true
-            self.splash:show('You resolve to NEVER climb another random ladder again...')
+            self.splash:show('You resolve to stay away from random ladders')
         end,
         [27] = function()
-            self.splash:show('or not...')
+            self.splash:show('wow...')
         end,
         [28] = function()
             removeTiles(self, 14)
@@ -442,6 +458,7 @@ function game:enter()
             else
                 summonTiles(self, 31)
                 summonTiles(self, 32)
+                summonTiles(self, 37)
                 self.triggers[48].active = true
             end
         end,
@@ -453,6 +470,7 @@ function game:enter()
             else
                 self.triggers[46].active = true
             end
+            self.skippedLadder = true
             removeTiles(self, 13)
             self.triggers[17].active = false
             self.triggers[18].active = false
@@ -540,12 +558,12 @@ function game:enter()
             self.currentSplash = 1
             self.camera.smoother = Camera.smooth.damped(2)
 
-            Timer.every(0.5, function()
+            Timer.every(4, function()
                 self.currentSplash = self.currentSplash + 1
                 self.splash:show(lemon_dialogue[self.currentSplash], true)
             end) : limit(4)
 
-            Timer.after(2, function()
+            Timer.after(20, function()
                 self.lemon_camera = false
                 self.camera.smoother = Camera.smooth.damped(15)
                 removeTiles(self, 20)
@@ -564,7 +582,7 @@ function game:enter()
                 [self.lemonadeMan] = {
                     opacity = 1
                 }
-            }) : ease(Easing.inOutSine)
+            }) : ease(Easing.inOutQuad)
         end,
         [34] = function()
             self.triggers[35].active = true
@@ -604,24 +622,19 @@ function game:enter()
             self.splash:show(lemon_dialogue[self.currentSplash], true)
             self.splash:hideLemons()
 
-            Timer.every(0.5, function()
+            Timer.every(4, function()
                 self.currentSplash = self.currentSplash + 1
-                if not self.has_laddered and self.currentSplash == 18 then
-                    self.splash:show(lemon_dialogue[self.currentSplash], true)
-                    Lemon(69, -5, self.world, true)
-                elseif self.currentSplash == 18 then
-                    self.splash:show(lemon_dialogue[20], true)
-                    Lemon(85, -8, self.world, true)
-                end
+                self.splash:show(lemon_dialogue[self.currentSplash], true)
+
                 if self.currentSplash == 16 then
                     self.temporary_lemon = Lemon(57, -3, self.world)
                     self.temporary_lemon.opacity = 0
-                    Timer.tween(1.5, {
+                    Timer.tween(0.75, {
                         [self.lemonadeMan] = {
                             arm_up = 2.35
                         }
                     }) : ease(Easing.inOutQuint)
-                    Timer.after(0.75, function()
+                    Timer.after(0.5, function()
                         Timer.tween(0.5, {
                             [self.temporary_lemon] = {
                                 opacity = 1,
@@ -644,6 +657,12 @@ function game:enter()
                     end)
                     self.temporary_lemon:pickup()
                     self.splash:hideLemons()
+                elseif not self.has_laddered and self.currentSplash == 18 then
+                    self.splash:show(lemon_dialogue[self.currentSplash], true)
+                    Lemon(69, -5, self.world, true)
+                elseif self.currentSplash == 18 then
+                    self.splash:show(lemon_dialogue[20], true)
+                    Lemon(85, -8, self.world, true)
                 end
             end) : limit(6)
             : finish(function()
@@ -661,6 +680,7 @@ function game:enter()
                 else
                     summonTiles(self, 31)
                     summonTiles(self, 33)
+                    summonTiles(self, 37)
                 end
                 self.triggers[41].active = true
             end)
@@ -684,7 +704,7 @@ function game:enter()
                     }
                 }) : ease(Easing.inOutQuad)
                 : finish(function()
-                    Timer.tween(1.25, {
+                    Timer.tween(1.75, {
                         [self.lemonadeMan] = {
                             arm_up = math.pi * 6 + 2.35
                         }
@@ -707,7 +727,7 @@ function game:enter()
                     Timer.after(2, function()
                         Timer.tween(0.15, {
                             [self] = {
-                                anvil_x = self.player.x - 10,
+                                anvil_x = self.player.x - 5,
                                 anvil_y = self.player.y + self.player.h - 16
                             }
                         }) : ease(Easing.inCubic)
@@ -730,6 +750,7 @@ function game:enter()
                                 removeTiles(self, 21)
                                 removeTiles(self, 22)
                                 removeTiles(self, 23)
+                                removeTiles(self, 24)
                                 removeTiles(self, 36)
 
                                 if not self.has_laddered then
@@ -742,6 +763,7 @@ function game:enter()
                                     self.player = Player(104 * TILE_SIZE, -8 * TILE_SIZE, self.world, self.splash)
                                     summonTiles(self, 31)
                                     summonTiles(self, 34)
+                                    summonTiles(self, 37)
                                     self.triggers[44].active = true
                                 end
 
@@ -769,7 +791,7 @@ function game:enter()
             summonTiles(self, 21)
             self.splash:show('There\'s a sign here. You can just barely decipher the writing:')
 
-            Timer.every(5, function()
+            Timer.every(4, function()
                 self.currentSplash = self.currentSplash + 1
                 self.splash:show(lemon_dialogue[self.currentSplash], true)
             end) : limit(7)
@@ -815,6 +837,7 @@ function game:enter()
                             self.player = Player(104 * TILE_SIZE, -8 * TILE_SIZE, self.world, self.splash)
                             summonTiles(self, 31)
                             summonTiles(self, 34)
+                            summonTiles(self, 37)
                             self.triggers[44].active = true
                         end
 
@@ -842,6 +865,7 @@ function game:enter()
             summonTiles(self, 12)
             summonTiles(self, 13)
             summonTiles(self, 16)
+            summonTiles(self, 35)
             self.triggers[16].active = true
             self.splash:show('Knowing this world the way you did, it wouldn\'t\nbe long before it threw something else your way')
         end,
@@ -901,7 +925,7 @@ function game:enter()
             self.splash:show('A throbbing pain pierces your skull as you contemplate your failure')
         end,
         [45] = function()
-            -- self.triggers[45].active = true
+            self.triggers[53].active = true
             self.splash:show('It seemed as if it could only go down from here')
         end,
         -- Ladder to end
@@ -910,12 +934,14 @@ function game:enter()
             self.splash:show('You begin to question where this world was trying to bring you')
         end,
         [47] = function()
-            -- self.triggers[45].active = true
+            summonTiles(self, 31)
+            summonTiles(self, 37)
+            self.triggers[53].active = true
             self.splash:show('A leap of faith... or certain doom?')
         end,
         [48] = function()
-            -- self.triggers[45].active = true
-            self.splash:show('A plunge into the abyss?')
+            self.triggers[53].active = true
+            self.splash:show('Another trap?')
         end,
         -- Lemonade success to end
         [49] = function()
@@ -931,10 +957,97 @@ function game:enter()
         end,
         [51] = function()
             self.splash:show('It still felt a bit... empty')
-            -- self.triggers[].active = true
+            self.triggers[53].active = true
+            self.triggers[59].active = true
         end,
         [52] = function()
             self.splash:show('Surely it wouldn\'t hurt to try')
+        end,
+        -- End
+        [53] = function()
+            Timer.after(2, function()
+                removeTiles(self, 31)
+            end)
+            self.triggers[54].active = true
+            self.triggers[55].active = true
+            self.splash:show('...and the world was silent...')
+        end,
+        [54] = function()
+            summonTiles(self, 38)
+            summonTiles(self, 39)
+            self.triggers[55].active = false
+            self.triggers[56].active = true
+            self.splash:show('In the silence, you wonder if it could have ended differently')
+        end,
+        [55] = function()
+            summonTiles(self, 38)
+            summonTiles(self, 39)
+            self.triggers[54].active = false
+            self.triggers[56].active = true
+            self.splash:show('In the silence, you wonder if it could have ended differently')
+        end,
+        [56] = function()
+            self.triggers[57].active = true
+            if self.skippedLadder then
+                self.splash:show('What if you had tried to climb that ladder?')
+            else
+                self.splash:show('What if you had never climbed that ladder?')
+            end
+        end,
+        [57] = function()
+            removeTiles(self, 37)
+            removeTiles(self, 39)
+            self.triggers[58].active = true
+            if self.skippedParkour then
+                self.splash:show('What if you hadn\'t given up?')
+            else
+                self.splash:show('What if you could have gone another way?')
+            end
+        end,
+        [58] = function()
+            -- Final cutscene
+            Timer.after(2, function()
+                removeTiles(self, 38)
+            end)
+            summonTiles(self, 40)
+            self.splash:show('Would you have been happier then, in your \'perfect\' world?')
+
+            Timer.tween(5, {
+                [self] = {
+                    cinematic_fade = 0.2
+                }
+            }) : ease(Easing.inOutQuad)
+
+            Timer.after(8, function()
+                self.splash:show('...would your experiences have meant anything?')
+                Timer.after(7, function()
+                    self.splash:show('')
+                end)
+            end)
+
+            Timer.tween(16, {
+                [self] = {
+                    fade_out_x = TILE_SIZE * 25
+                }
+            }) : ease(Easing.inCirc)
+            : finish(function()
+                self.splash:show('')
+                Timer.after(2, function()
+                    self.splash:show('\n\n\n\n\n\n\n\n\nWould your life have meant anything?')
+                    Timer.after(5, function()
+                        self.splash:show('')
+                        Timer.after(3, function()
+                            State.switch(States.start)
+                        end)
+                    end)
+                end)
+            end)
+        end,
+        -- Misc.
+        [59] = function()
+            -- Force the player to go down
+            removeTiles(self, 28)
+            summonTiles(self, 41)
         end,
     }
 
@@ -974,11 +1087,11 @@ function game:enter()
     -- Needed for ladder
     self.ladderTimeStart = 0
     self.ladderTimeEnd = 0
-    self.currentSplash = 0
     self.shuffled = false
     self.splashTime = 0
     self.humanTime = ''
     self.has_laddered = false
+    self.skippedLadder = false
 
     -- Parallax background
     self.background_x = -440
@@ -1018,7 +1131,14 @@ function game:enter()
     self.anvil_x = self.lemonadeMan.x
     self.anvil_y = -100
     self.lemon_camera = false
-    self.has_lemoned = true
+    self.has_lemoned = false
+
+    -- Misc.
+    self.currentSplash = 0
+    self.skippedParkour = false
+    self.fade_out_x = 0
+    self.cinematic_fade = 0
+
 end
 
 function game:resume()
@@ -1031,7 +1151,9 @@ function game:update(dt)
 
     self.splash:update(dt)
 
-    ladderTimer(self)
+    if self.triggers[20].active == true then
+        ladderTimer(self)
+    end
 
     Timer.update(dt)
 
@@ -1136,11 +1258,13 @@ function game:draw()
 
     -- Draw background
     lg.setColor(Colors[16])
+
     if not self.lemon_camera then
         lg.rectangle('fill', self.player.x + self.player.w / 2 - 225, self.player.y - 305, 450, 450)
     else
         lg.rectangle('fill', TILE_SIZE * 56.5 - 250, TILE_SIZE * -1.5 - 230, 500, 400)
     end
+
     if DEBUG then
         lg.setColor(Colors[11])
         lg.rectangle('line', self.player.x + self.player.w / 2 - 200, self.player.y - 180, 400, 300)
@@ -1150,9 +1274,7 @@ function game:draw()
     for i = 1, 3 do
         local loop = self.loops[i]
 
-
         lg.setColor(1, 1, 1, (i + 1) / 5)
-
         lg.draw(loop.img, self.background_x * loop.speed + loop.x1, self.background_y + loop.y1)
         lg.draw(loop.img, self.background_x * loop.speed + loop.x1, self.background_y + loop.y2)
         lg.draw(loop.img, self.background_x * loop.speed + loop.x2, self.background_y + loop.y1)
@@ -1165,25 +1287,57 @@ function game:draw()
 
     for i = 1, len do
         local item = items[i]
-        if item.name == 'tile' and item.x + TILE_SIZE >= self.player.x - VIRT_WIDTH / 2 and item.x <= self.player.x + self.player.w + VIRT_WIDTH / 2 then
-            item:render(item)
-        elseif item.name == 'lemon' then
-            item:render()
+        if item.x + TILE_SIZE >= self.camera.x - VIRT_WIDTH / 4 and item.x <= self.camera.x + VIRT_WIDTH / 4 and item.y + TILE_SIZE >= self.camera.y - VIRT_HEIGHT / 3 and item.y <= self.camera.y + VIRT_HEIGHT / 3 then
+            if item.name == 'tile' or item.name == 'lemon' then
+                item:render()
+            end
         end
     end
 
-    lg.setColor(1, 1, 1, self.stand_opacity)
-    lg.draw(Graphics['stand'], TILE_SIZE * 56, -40)
+    if self.stand_opacity > 0 then
+        lg.setColor(1, 1, 1, self.stand_opacity)
+        lg.draw(Graphics['stand'], TILE_SIZE * 56, -40)
+    end
 
-    lg.setColor(1, 1, 1, self.sign_opacity)
-    lg.draw(Graphics['sign'], TILE_SIZE * 56, -40)
+    if self.sign_opacity > 0 then
+        lg.setColor(1, 1, 1, self.sign_opacity)
+        lg.draw(Graphics['sign'], TILE_SIZE * 56, -40)
+    end
 
     lg.setColor(1, 1, 1, 1)
-    self.lemonadeMan:render()
+
+    if self.lemonadeMan.opacity > 0 then
+        self.lemonadeMan:render()
+    end
+
     self.player:render()
 
-    lg.setColor(1, 1, 1, self.anvil_opacity)
-    lg.draw(Graphics['anvil'], self.anvil_x - 10, self.anvil_y)
+    if self.anvil_opacity > 0 then
+        lg.setColor(1, 1, 1, self.anvil_opacity)
+        lg.draw(Graphics['anvil'], self.anvil_x - 10, self.anvil_y)
+    end
+
+    if self.cinematic_fade > 0 then
+        lg.setColor(Colors[2][1], Colors[2][2], Colors[2][3], self.cinematic_fade)
+        lg.rectangle('fill', self.player.x + self.player.w / 2 - 225, self.player.y - 305, 450, 450)
+    end
+
+    if self.cinematic_fade > 0 then
+
+        lg.setColor(Colors[4][1], Colors[4][2], Colors[4][3], 0.75)
+        -- Left
+        lg.rectangle('fill', TILE_SIZE * 16.5 + self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 33, TILE_SIZE * 20)
+        lg.rectangle('fill', TILE_SIZE * 16.5 + self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 32.5, TILE_SIZE * 20)
+        lg.rectangle('fill', TILE_SIZE * 16.5 + self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 32, TILE_SIZE * 20)
+        lg.rectangle('fill', TILE_SIZE * 16.5 + self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 31.5, TILE_SIZE * 20)
+        lg.rectangle('fill', TILE_SIZE * 16.5 + self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 31, TILE_SIZE * 20)
+        -- Right
+        lg.rectangle('fill', TILE_SIZE * 89.5 - self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 33, TILE_SIZE * 20)
+        lg.rectangle('fill', TILE_SIZE * 90   - self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 32.5, TILE_SIZE * 20)
+        lg.rectangle('fill', TILE_SIZE * 90.5 - self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 32, TILE_SIZE * 20)
+        lg.rectangle('fill', TILE_SIZE * 91   - self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 31.5, TILE_SIZE * 20)
+        lg.rectangle('fill', TILE_SIZE * 91.5 - self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 31, TILE_SIZE * 20)
+    end
 
     if DEBUG then
         lg.setColor(Colors[10])
@@ -1215,8 +1369,10 @@ function game:draw()
 
     self.splash:render()
 
-    lg.setColor(Colors[4][1], Colors[4][2], Colors[4][3], self.fade_in_opacity)
-    lg.rectangle('fill', 0, 0, VIRT_WIDTH, VIRT_HEIGHT)
+    if self.fade_in_opacity > 0 then
+        lg.setColor(Colors[4][1], Colors[4][2], Colors[4][3], self.fade_in_opacity)
+        lg.rectangle('fill', 0, 0, VIRT_WIDTH, VIRT_HEIGHT)
+    end
 
     Resolution.stop()
 end

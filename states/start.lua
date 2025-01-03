@@ -58,8 +58,10 @@ end
 
 function start:mousepressed(x, y, mbutton)
     local mx, my = Resolution.toGame(x, y)
-    for _, b in ipairs(self.buttons) do
-        b:click(mx, my, mbutton)
+    if self.can_click then
+        for _, b in ipairs(self.buttons) do
+            b:click(mx, my, mbutton)
+        end
     end
 end
 
