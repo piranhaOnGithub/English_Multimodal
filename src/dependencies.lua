@@ -28,7 +28,7 @@ require 'src.class.Tile'
 
 -- [[ States ]]
 States = {
-    config  = require 'states.config',
+    credits = require 'states.credits',
     game    = require 'states.game',
     intro   = require 'states.intro',
     start   = require 'states.start',

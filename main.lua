@@ -31,7 +31,7 @@ love.load = function()
 
     -- Enter gamestate
     State.registerEvents(callbacks)
-    State.switch(States.game)
+    State.switch(States.start)
 end
 
 love.update = function(dt)

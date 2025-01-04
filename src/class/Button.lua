@@ -42,7 +42,7 @@ function Button:render()
 
     -- text
     love.graphics.setFont(Fonts.default[15])
-    love.graphics.setColor(Colors[7])
+    love.graphics.setColor(Colors[1])
     love.graphics.printf(tostring(self.t), self.x, self.y + self.h / 4, self.w, "center")
 
     -- Show whether the mouse is over the Button

@@ -137,7 +137,7 @@ local function ladderTimer(self)
     if math.floor(timeSpentOnLadder) >= self.splashTime then
 
         self.splash:show(message, alt_text)
-        self.splashTime = self.splashTime + 5
+        self.splashTime = self.splashTime + 4
 
         if self.currentSplash == 21 then
             -- New attributes
@@ -735,6 +735,7 @@ function game:enter()
                             }
                         }) : ease(Easing.inCubic)
                         : finish(function()
+                            Audio['smash']:play()
                             Timer.tween(0.05, {
                                 [self] = {
                                     fade_in_opacity = 1
@@ -809,6 +810,7 @@ function game:enter()
                     }
                 }) : ease(Easing.inCubic)
                 : finish(function()
+                    Audio['smash']:play()
                     Timer.tween(0.05, {
                         [self] = {
                             fade_in_opacity = 1
@@ -968,6 +970,14 @@ function game:enter()
         end,
         -- End
         [53] = function()
+            Timer.tween(0.25, {
+                [self] = {
+                    music_volume = 0
+                }
+            }) : ease(Easing.inCubic)
+            : finish(function()
+                Audio['music-1']:stop()
+            end)
             Timer.after(2, function()
                 removeTiles(self, 31)
             end)
@@ -1023,6 +1033,11 @@ function game:enter()
 
             Timer.after(8, function()
                 self.splash:show('...would your experiences have meant anything?')
+                Timer.tween(8, {
+                    [self] = {
+                        zoom = 0.25
+                    }
+                })
                 Timer.after(7, function()
                     self.splash:show('')
                 end)
@@ -1030,11 +1045,12 @@ function game:enter()
 
             Timer.tween(16, {
                 [self] = {
-                    fade_out_x = TILE_SIZE * 25
+                    fade_out_x = VIRT_WIDTH / 2 + 75
                 }
             }) : ease(Easing.inCirc)
             : finish(function()
                 self.splash:show('')
+                self.player.inPlay = false
                 Timer.after(2, function()
                     self.splash:show('\n\n\n\n\n\n\n\n\nWould your life have meant anything?')
                     Timer.after(5, function()
@@ -1101,6 +1117,16 @@ function game:enter()
         end)
     end)
 
+    -- Start music
+    Audio['music-1']:play()
+    Audio['music-1']:setLooping(true)
+    self.music_volume = 0
+    Timer.tween(10, {
+        [self] = {
+            music_volume = 1
+        }
+    }) : ease(Easing.inOutQuad)
+
     -- Needed for ladder
     self.ladderTimeStart = 0
     self.ladderTimeEnd = 0
@@ -1157,6 +1183,7 @@ function game:enter()
     self.cinematic_fade = 0
     self.tutorial_opacity = 0
     self.hacker_ending = false
+    self.zoom = 2
 end
 
 function game:resume()
@@ -1262,6 +1289,12 @@ function game:update(dt)
         end)
     end
 
+    Audio['music-1']:setVolume(self.music_volume)
+
+    if not DEBUG then
+        self.camera:zoomTo(self.zoom)
+    end
+
     LastKeyPress = {}
 end
 
@@ -1357,24 +1390,7 @@ function game:draw()
 
     if self.cinematic_fade > 0 then
         lg.setColor(Colors[2][1], Colors[2][2], Colors[2][3], self.cinematic_fade)
-        lg.rectangle('fill', self.player.x + self.player.w / 2 - 225, self.player.y - 305, 450, 450)
-    end
-
-    if self.cinematic_fade > 0 then
-
-        lg.setColor(Colors[4][1], Colors[4][2], Colors[4][3], 0.75)
-        -- Left
-        lg.rectangle('fill', TILE_SIZE * 16.5 + self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 33, TILE_SIZE * 20)
-        lg.rectangle('fill', TILE_SIZE * 16.5 + self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 32.5, TILE_SIZE * 20)
-        lg.rectangle('fill', TILE_SIZE * 16.5 + self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 32, TILE_SIZE * 20)
-        lg.rectangle('fill', TILE_SIZE * 16.5 + self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 31.5, TILE_SIZE * 20)
-        lg.rectangle('fill', TILE_SIZE * 16.5 + self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 31, TILE_SIZE * 20)
-        -- Right
-        lg.rectangle('fill', TILE_SIZE * 89.5 - self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 33, TILE_SIZE * 20)
-        lg.rectangle('fill', TILE_SIZE * 90   - self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 32.5, TILE_SIZE * 20)
-        lg.rectangle('fill', TILE_SIZE * 90.5 - self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 32, TILE_SIZE * 20)
-        lg.rectangle('fill', TILE_SIZE * 91   - self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 31.5, TILE_SIZE * 20)
-        lg.rectangle('fill', TILE_SIZE * 91.5 - self.fade_out_x, TILE_SIZE * 50, TILE_SIZE * 31, TILE_SIZE * 20)
+        lg.rectangle('fill', self.camera.x - VIRT_WIDTH / 4, self.camera.y - VIRT_HEIGHT / 4, VIRT_WIDTH / 2, VIRT_HEIGHT / 2)
     end
 
     if DEBUG then
@@ -1409,6 +1425,23 @@ function game:draw()
     if self.tutorial_opacity > 0 then
         lg.setColor(1, 1, 1, self.tutorial_opacity)
         lg.draw(Graphics['arrows'], VIRT_WIDTH / 2 - 56, VIRT_HEIGHT / 2.5, 0, 2, 2)
+    end
+
+    if self.cinematic_fade > 0 then
+
+        lg.setColor(Colors[4][1], Colors[4][2], Colors[4][3], 0.75)
+        -- Left
+        lg.rectangle('fill', self.fade_out_x - 650, 0, 600, VIRT_HEIGHT)
+        lg.rectangle('fill', self.fade_out_x - 650, 0, 585, VIRT_HEIGHT)
+        lg.rectangle('fill', self.fade_out_x - 650, 0, 570, VIRT_HEIGHT)
+        lg.rectangle('fill', self.fade_out_x - 650, 0, 555, VIRT_HEIGHT)
+        lg.rectangle('fill', self.fade_out_x - 650, 0, 540, VIRT_HEIGHT)
+        -- Right
+        lg.rectangle('fill', VIRT_WIDTH - self.fade_out_x + 50, 0, 600, VIRT_HEIGHT)
+        lg.rectangle('fill', VIRT_WIDTH - self.fade_out_x + 65, 0, 585, VIRT_HEIGHT)
+        lg.rectangle('fill', VIRT_WIDTH - self.fade_out_x + 80, 0, 570, VIRT_HEIGHT)
+        lg.rectangle('fill', VIRT_WIDTH - self.fade_out_x + 95, 0, 555, VIRT_HEIGHT)
+        lg.rectangle('fill', VIRT_WIDTH - self.fade_out_x + 110, 0, 540, VIRT_HEIGHT)
     end
 
     self.splash:render()

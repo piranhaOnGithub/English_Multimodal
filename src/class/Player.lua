@@ -14,6 +14,8 @@ function Player:init(x, y, world, splash)
     self.world  = world
     self.splash = splash
     self.phase  = false
+    self.jumped = false
+    self.inPlay = true
     self.lemons = 0
     self.limes  = 0
 
@@ -30,18 +32,35 @@ function Player:update(dt)
 
     self.dx = Lume.clamp(self.dx, -1, 1)
 
-    if lk.isDown('left') and not lk.isDown('right') and not lk.isDown('d')
-    or lk.isDown('a') and not lk.isDown('right') and not lk.isDown('d') then
-        self.dx = self.dx - 0.3
-    elseif lk.isDown('right') and not lk.isDown('left') and not lk.isDown('a')
-    or lk.isDown('d') and not lk.isDown('left') and not lk.isDown('a') then
-        self.dx = self.dx + 0.3
+
+    if self.inPlay then
+        if lk.isDown('left') and not lk.isDown('right') and not lk.isDown('d')
+        or lk.isDown('a') and not lk.isDown('right') and not lk.isDown('d') then
+            self.dx = self.dx - 0.3
+        elseif lk.isDown('right') and not lk.isDown('left') and not lk.isDown('a')
+        or lk.isDown('d') and not lk.isDown('left') and not lk.isDown('a') then
+            self.dx = self.dx + 0.3
+        end
+
+        if LastKeyPress['up'] and self.dy == 0.25
+        or LastKeyPress['w'] and self.dy == 0.25
+        or LastKeyPress['space'] and self.dy == 0.25 then
+            self.dy = -3
+            Audio['jump']:stop()
+            Audio['jump']:setPitch(math.random(9, 11) / 10)
+            Audio['jump']:play()
+        end
     end
 
-    if LastKeyPress['up'] and self.dy == 0.25
-    or LastKeyPress['w'] and self.dy == 0.25
-    or LastKeyPress['space'] and self.dy == 0.25 then
-        self.dy = -3
+    if self.dy > 3.5 then
+        self.jumped = true
+    end
+
+    if self.dy == 0.25 and self.dx ~= 0 then
+        if not Audio['walk']:isPlaying() then
+            Audio['walk']:setPitch(math.random(9, 11) / 10)
+        end
+        Audio['walk']:play()
     end
 
     -- Apply velocity
@@ -70,6 +89,12 @@ function Player:update(dt)
             if col.t <= 28 then
                 if col.x < self.x + self.w and col.x + TILE_SIZE > self.x then
                     self.dy = 0.1
+                    if self.jumped then
+                        Audio['fall']:stop()
+                        Audio['fall']:setPitch(math.random(9, 11) / 10)
+                        Audio['fall']:play()
+                        self.jumped = false
+                    end
                 elseif col.y < self.y then
                     self.dx = 0
                 end
@@ -79,6 +104,14 @@ function Player:update(dt)
                     self.dx = 0
                     self.x = Lume.lerp(self.x, -self.w / 2 + col.x + TILE_SIZE / 2, 0.03)
                 end
+
+                if self.dy ~= 0.25 then
+                    if not Audio['ladder']:isPlaying() then
+                        Audio['ladder']:setPitch(math.random(9, 11) / 10)
+                    end
+                    Audio['ladder']:play()
+                end
+
                 self.dy = Lume.clamp(self.dy, -0.8, 0.8)
             elseif col.t == 30 or col.t == 31 then
                 self.dx = 0
@@ -86,13 +119,15 @@ function Player:update(dt)
         elseif col.name == 'trigger' and col.active then
             col:trigger()
         elseif col.name == 'lemon' and not col.acquired then
+            col:pickup()
+
+            Audio['lemon'][math.random(1, 3)]:clone():play()
+
             if not col.is_lime then
-                col:pickup()
                 self.lemons = self.lemons + 1
                 self.splash:displayLemons(self, false)
                 print('LEMON acquired. You now have ' .. tostring(self.lemons) .. ' LEMONs')
             else
-                col:pickup()
                 self.limes = self.limes + 1
                 self.splash:displayLemons(self, true)
                 print('LIME acquired. You now have ' .. tostring(self.limes) .. ' LIMEs')

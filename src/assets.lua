@@ -1,8 +1,21 @@
 -- Assets to be used in the game
 
 Audio = {
-    ['hover'] = la.newSource('assets/audio/hover.ogg', 'static'),
-    ['click'] = la.newSource('assets/audio/click.ogg', 'static'),
+    ['click']   = la.newSource('assets/audio/click.ogg', 'static'),
+    ['fall']    = la.newSource('assets/audio/fall.ogg', 'static'),
+    ['hover']   = la.newSource('assets/audio/hover.ogg', 'static'),
+    ['jump']    = la.newSource('assets/audio/jump.ogg', 'static'),
+    ['ladder']  = la.newSource('assets/audio/ladder.ogg', 'static'),
+    ['lemon']   = {
+        la.newSource('assets/audio/lemon-1.ogg', 'static'),
+        la.newSource('assets/audio/lemon-2.ogg', 'static'),
+        la.newSource('assets/audio/lemon-3.ogg', 'static'),
+    },
+    ['smash']   = la.newSource('assets/audio/smash.ogg', 'static'),
+    ['walk']    = la.newSource('assets/audio/step.ogg', 'static'),
+
+    ['music-1'] = la.newSource('assets/audio/not-to-notice.ogg', 'stream'),
+    ['music-2'] = la.newSource('assets/audio/soft-music-box.ogg', 'stream'),
 }
 Graphics = {
     ['anvil']   = lg.newImage('assets/graphics/you-failed.png'),
