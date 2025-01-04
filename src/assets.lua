@@ -28,6 +28,8 @@ Graphics = {
     ['sign']    = lg.newImage('assets/graphics/too-many-lemons.png'),
     ['stand']   = lg.newImage('assets/graphics/limeade-stand.png'),
     ['tileset'] = lg.newImage('assets/graphics/tileset.png'),
+    ['title']   = lg.newImage('assets/graphics/title.png'),
+    ['stars']   = lg.newImage('assets/graphics/title-stars.png'),
     tile = {},
 }
 

@@ -37,11 +37,11 @@ end
 
 function Button:render()
     -- hitbox, purple, transparent
-    love.graphics.setColor(Colors[4])
+    love.graphics.setColor(Colors[4][1], Colors[4][2], Colors[4][3], 0.5)
     love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
 
     -- text
-    love.graphics.setFont(Fonts.default[15])
+    love.graphics.setFont(Fonts.light[18])
     love.graphics.setColor(Colors[1])
     love.graphics.printf(tostring(self.t), self.x, self.y + self.h / 4, self.w, "center")
 

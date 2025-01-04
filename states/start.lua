@@ -3,7 +3,7 @@ local start = {}
 function start:init()
     self.num = 1
     self.buttons = {
-        Button(VIRT_WIDTH / 2 - 50, VIRT_HEIGHT / 2 + 30, 100, 30, 'game', function()
+        Button(VIRT_WIDTH / 2 - 125, VIRT_HEIGHT / 2 + 130, 250, 35, 'CONTINUE', function()
             self.can_click = false
             Timer.tween(0.5, {
                 [self] = {
@@ -16,17 +16,17 @@ function start:init()
                 State.switch(States.intro)
             end)
         end),
-        Button(VIRT_WIDTH / 2 - 50, VIRT_HEIGHT / 2 + 75, 100, 30, 'credits', function()
+        Button(VIRT_WIDTH / 2 - 125, VIRT_HEIGHT / 2 + 175, 65, 30, 'credits', function()
             State.push(States.credits)
         end),
-        Button(VIRT_WIDTH / 2 - 50, VIRT_HEIGHT / 2 + 120, 100, 30, 'sound: on', function()
+        Button(VIRT_WIDTH / 2 - 50, VIRT_HEIGHT / 2 + 175, 100, 30, 'sound: on', function()
             if la.getVolume() == 1 then
                 la.setVolume(0)
             else
                 la.setVolume(1)
             end
         end),
-        Button(VIRT_WIDTH / 2 - 50, VIRT_HEIGHT / 2 + 210, 100, 30, 'quit', function()
+        Button(VIRT_WIDTH / 2 + 60, VIRT_HEIGHT / 2 + 175, 65, 30, 'quit', function()
             love.event.quit()
         end),
     }
@@ -34,7 +34,7 @@ end
 
 function start:enter()
 
-    lg.setBackgroundColor(Colors[3])
+    lg.setBackgroundColor(Colors[2])
 
     self.can_click = true
 
@@ -49,11 +49,14 @@ function start:enter()
     Audio['music-2']:play()
     Audio['music-2']:setLooping(true)
 
+
+    self.star_x1 = 0
+    self.star_x2 = -1200
 end
 
 function start:resume()
 
-    lg.setBackgroundColor(Colors[3])
+    lg.setBackgroundColor(Colors[2])
 
 end
 
@@ -65,6 +68,22 @@ function start:update(dt)
     end
 
     Timer.update(dt)
+
+    self.offset_x = math.cos(lt.getTime() * 2) * 5
+    self.offset_y = math.sin(lt.getTime() * 2) * 2
+    self.rotation = math.sin(lt.getTime() * -2) * 0.025
+
+    self.star_x1 = self.star_x1 + 0.15
+    self.star_x2 = self.star_x2 + 0.15
+
+    if self.star_x1 >= VIRT_WIDTH then
+        self.star_x1 = -1200
+    end
+    -- print(self.star_x1)
+
+    if self.star_x2 >= VIRT_WIDTH then
+        self.star_x2 = -1200
+    end
 
     Audio['music-2']:setVolume(self.music_volume)
 end
@@ -93,9 +112,22 @@ function start:draw()
 
     Resolution.start()
 
+    -- Stars
+    lg.setColor(1, 1, 1, 1)
+    lg.draw(Graphics['stars'], self.star_x1, -VIRT_WIDTH / 4, 0, 3, 3)
+    lg.draw(Graphics['stars'], self.star_x2, -VIRT_WIDTH / 4, 0, 3, 3)
+
     for _, b in ipairs(self.buttons) do
         b:render()
     end
+
+    -- Title
+    lg.push()
+    lg.translate(VIRT_WIDTH / 2, 240)
+    lg.rotate(self.rotation)
+    lg.setColor(0.9, 0.9, 0.9, 0.5)
+    lg.draw(Graphics['title'], -270 + self.offset_x, -96 + self.offset_y, 0, 4, 4)
+    lg.pop()
 
     lg.setColor(Colors[4][1], Colors[4][2], Colors[4][3], self.fade_in_opacity)
     lg.rectangle('fill', 0, 0, VIRT_WIDTH, VIRT_HEIGHT)

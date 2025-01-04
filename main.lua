@@ -77,15 +77,15 @@ love.draw = function()
 end
 
 love.keypressed = function(key)
-    if key == "escape" then
-        love.event.quit()
-    end
-    if key == "lctrl" then
-        DEBUG = not DEBUG
-    end
-    if key == "rctrl" then
-        love.event.quit("restart")
-    end
+    -- if key == "escape" then
+    --     love.event.quit()
+    -- end
+    -- if key == "lctrl" then
+    --     DEBUG = not DEBUG
+    -- end
+    -- if key == "rctrl" then
+    --     love.event.quit("restart")
+    -- end
     if key == "f11" then
         toggle.fullscreen = not toggle.fullscreen
         love.window.setFullscreen(toggle.fullscreen)
