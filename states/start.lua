@@ -45,6 +45,7 @@ function start:enter()
         [self] = {fade_in_opacity = 0}
     }) : ease(Easing.inOutSine)
 
+    Audio['click']:setPitch(1)
 
     Audio['music-2']:play()
     Audio['music-2']:setLooping(true)

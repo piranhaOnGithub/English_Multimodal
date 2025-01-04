@@ -37,7 +37,7 @@ function credits:draw()
 
     lg.setColor(Colors[1])
     lg.setFont(Fonts.display[18])
-    lg.printf('PROGRAMMING:\nKalan Wolfe\n\nSFX:\n(WALK, JUMP, LAND) - JiggleSticks\n(ITEM PICKUP) - IENBA\n(GLASS) - GN2013\n(LADDER) - alec_mackay\n\nMUSIC:\n(MENU) "soft music box" - ZHRO\n(GAME) "Not To Notice" - Andrewkn\n\nREFERENCE ART:\n(LEMON) - Shutterstock\n(ANVIL) - Xiori on Pixilart.com\n\nCOLOR PALETTE:\n"Fading 16" - CopheeMoth on Lospec.com', 30 + self.offset_x, VIRT_HEIGHT / 4 + self.offset_y, VIRT_WIDTH, 'left')
+    lg.printf('PROGRAMMING:\nKalan Wolfe\n\nSFX:\n(WALK, JUMP, LAND) - JiggleSticks\n(ITEM PICKUP) - IENBA\n(GLASS) - GN2013\n(LADDER) - alec_mackay\n\nMUSIC:\n(MENU) "soft music box" - ZHRO\n(GAME) "Wonderful" - ispeakwaves\n\nREFERENCE ART:\n(LEMON) - Shutterstock\n(ANVIL) - Xiori on Pixilart.com\n\nCOLOR PALETTE:\n"Fading 16" - CopheeMoth on Lospec.com', 30 + self.offset_x, VIRT_HEIGHT / 4 + self.offset_y, VIRT_WIDTH, 'left')
 
     lg.setFont(Fonts.display[24])
     lg.printf('All audio from Freesound.org', 30 + self.offset_x, 550 - self.offset_y, VIRT_WIDTH / 2, 'left')

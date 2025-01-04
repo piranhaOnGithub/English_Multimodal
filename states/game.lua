@@ -428,6 +428,7 @@ function game:enter()
             self.splash:show('You begin to think about all the time you wasted,\ntrying to climb that cursed ladder...')
         end,
         [25] = function()
+            self.camera.smoother = Camera.smooth.damped(22)
             local time = math.floor(self.ladderTimeEnd - self.ladderTimeStart)
             local minutes = math.floor(time / 60)
             local seconds = time - minutes * 60
@@ -445,6 +446,7 @@ function game:enter()
             self.splash:show('...it must have been about ' .. self.humanTime .. '!')
         end,
         [26] = function()
+            self.camera.smoother = Camera.smooth.damped(30)
             self.triggers[27].active = true
             self.triggers[28].active = true
             self.splash:show('You resolve to stay away from random ladders from now on')
@@ -1299,15 +1301,18 @@ function game:update(dt)
 end
 
 function game:keypressed(key, code)
-    if key == 'kp1' then
-        print(Inspect(self.player.dx))
-    elseif key == 'kp2' then
-        Lume.hotswap("src.class.LemonadeMan")
-    end
-    if DEBUG then
-        self.camera:zoomTo(1)
-    else
-        self.camera:zoomTo(2)
+    if key == 'escape' then
+        Timer.tween(0.5, {
+            [self] = {
+                fade_in_opacity = 1,
+                music_volume = 0
+            }
+        }) : ease(Easing.inOutSine)
+        : finish(function()
+            Audio['music-1']:stop()
+            self.splash:show('')
+            State.switch(States.start)
+        end)
     end
 end
 
@@ -1384,8 +1389,13 @@ function game:draw()
     self.player:render()
 
     if self.anvil_opacity > 0 then
-        lg.setColor(1, 1, 1, self.anvil_opacity)
-        lg.draw(Graphics['anvil'], self.anvil_x - 10, self.anvil_y)
+        if self.player.lemons > 3 then
+            lg.setColor(1, 1, 1, self.anvil_opacity)
+            lg.draw(Graphics['anvil'], self.anvil_x - 10, self.anvil_y)
+        else
+            lg.setColor(1, 1, 1, self.anvil_opacity)
+            lg.draw(Graphics['anvil'], self.anvil_x - 10, self.anvil_y)
+        end
     end
 
     if self.cinematic_fade > 0 then

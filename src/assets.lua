@@ -14,7 +14,7 @@ Audio = {
     ['smash']   = la.newSource('assets/audio/smash.ogg', 'static'),
     ['walk']    = la.newSource('assets/audio/step.ogg', 'static'),
 
-    ['music-1'] = la.newSource('assets/audio/not-to-notice.ogg', 'stream'),
+    ['music-1'] = la.newSource('assets/audio/piano-loop.ogg', 'stream'),
     ['music-2'] = la.newSource('assets/audio/soft-music-box.ogg', 'stream'),
 }
 Graphics = {

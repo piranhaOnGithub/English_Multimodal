@@ -99,7 +99,9 @@ function Player:update(dt)
                     self.dx = 0
                 end
             elseif col.t == 29 then
-                if lk.isDown('up') then
+                if lk.isDown('up')
+                or lk.isDown('w')
+                or lk.isDown('space') then
                     self.dy = -0.8
                     self.dx = 0
                     self.x = Lume.lerp(self.x, -self.w / 2 + col.x + TILE_SIZE / 2, 0.03)
