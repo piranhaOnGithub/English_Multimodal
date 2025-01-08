@@ -879,6 +879,7 @@ function game:enter()
         [41] = function()
             self.lemonadeMan.opacity = 0
             self.stand_opacity = 0
+            self.sign_opacity = 0
             if not self.has_laddered then
                 self.triggers[42].active = true
             else

@@ -5,3 +5,7 @@ assets/graphics/tile-3.png
 assets/graphics/tile-4-1.png
 assets/graphics/tile-4.png
 assets/graphics/tile-5.png
+builds/lovejs/game-lovejs.zip
+builds/love/game.love
+makelove.toml
+build.sh
